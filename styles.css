@@ -1,0 +1,68 @@
+.block_slider a, .block_slider a:hover, .block_slider a:active, .block_slider *, .block_slider a:focus {
+    text-decoration: none;
+}
+
+.block_slider .slider {
+	width: 100%;
+	background: transparent;
+}
+
+.block_slider #slides {
+    display: none;
+}
+
+.block_slider #slides .slidesjs-navigation {
+    margin-top: 3px;
+}
+
+.block_slider #slides .slidesjs-previous {
+    margin-right: 5px;
+    float: left;
+}
+
+.block_slider #slides .slidesjs-next {
+    margin-right: 5px;
+    float: left;
+}
+
+.block_slider .slidesjs-pagination {
+    margin: 6px 0 0;
+    float: right;
+    list-style: none;
+}
+
+.block_slider .slidesjs-pagination li {
+    float: left;
+    margin: 0 1px;
+}
+
+.block_slider .slidesjs-pagination li a {
+    display: block;
+    width: 13px;
+    height: 0;
+    padding-top: 13px;
+    background-image: url([[pix:block_slider|pagination]]);
+    background-position: 0 0;
+    float: left;
+    overflow: hidden;
+}
+
+.block_slider .slidesjs-pagination li a.active,     .slidesjs-pagination li a:hover.active {
+    background-position: 0 -13px;
+}
+
+.block_slider .slidesjs-pagination li a:hover {
+    background-position: 0 -26px;
+}
+
+.block_slider #slides a:link,    .block_slider #slides a:visited {
+    color: #333;
+}
+
+.block_slider #slides a:hover,    .block_slider #slides a:active {
+    color: #9e2020;
+}
+
+.block_slider .navbar {
+    overflow: hidden;
+}
