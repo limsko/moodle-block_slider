@@ -1,7 +1,3 @@
-.block_slider a, .block_slider a:hover, .block_slider a:active, .block_slider *, .block_slider a:focus {
-    text-decoration: none;
-}
-
 .block_slider .slider {
 	width: 100%;
 	background: transparent;
@@ -47,7 +43,8 @@
     overflow: hidden;
 }
 
-.block_slider .slidesjs-pagination li a.active,     .slidesjs-pagination li a:hover.active {
+.block_slider .slidesjs-pagination li a.active,
+.slidesjs-pagination li a:hover.active {
     background-position: 0 -13px;
 }
 
@@ -55,11 +52,13 @@
     background-position: 0 -26px;
 }
 
-.block_slider #slides a:link,    .block_slider #slides a:visited {
+.block_slider #slides a:link,
+.block_slider #slides a:visited {
     color: #333;
 }
 
-.block_slider #slides a:hover,    .block_slider #slides a:active {
+.block_slider #slides a:hover,
+.block_slider #slides a:active {
     color: #9e2020;
 }
 

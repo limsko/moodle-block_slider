@@ -24,21 +24,16 @@
 $string['pluginname'] = 'Slajder';
 $string['slider:addinstance'] = 'Dodaj nowy Slajder';
 $string['slider:myaddinstance'] = 'Dodaj nowy Slajder do mojej strony Moodle';
-
 $string['header'] = 'Nagłówek slidera';
 $string['images'] = 'Grafiki slidera';
-
 $string['width'] = 'Wysokość';
 $string['height'] = 'Szerokość';
-
 $string['nav'] = 'Nawigacja';
 $string['nav_desc'] = 'Włącza nawigację wstecz/dalej pod Slajderem';
-
-$string['pag'] = 'Pagination';
+$string['pag'] = 'Paginacja';
 $string['pag_desc'] = 'Włącza paginację pod Slajderem';
-
+$string['auto_play'] = 'Automatyczne oddtwarzanie';
+$string['auto_play_desc'] = 'Włącza automatyczne oddtwarzanie slajdów';
 $string['effect'] = 'Efekt przejścia';
-
 $string['int'] = 'Czas wyświetlania slajdu w ms';
-
 $string['noimages'] = 'Proszę wejdź w ustawienia bloku i dodaj jakieś obrazki';

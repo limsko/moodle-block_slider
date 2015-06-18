@@ -24,7 +24,7 @@
 
 function block_slider_pluginfile($course, $birecord_or_cm, $context, $filearea, $args, $forcedownload, array $options=array()) {
     global $DB, $CFG;
-
+	 
     if ($context->contextlevel != CONTEXT_BLOCK) {
         send_file_not_found();
     }

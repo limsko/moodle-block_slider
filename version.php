@@ -21,11 +21,7 @@
  * @copyright 2015 Kamil Łuczak    www.limsko.pl     kamil@limsko.pl
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-$plugin->version = 2015061621;  // YYYYMMDDHH (year, month, day, 24-hr time)
+$plugin->version = 2015061822;  // YYYYMMDDHH (year, month, day, 24-hr time)
 $plugin->requires  = 2013110500;  // YYYYMMDDHH (This is the release version for Moodle 2.0)
 $plugin->maturity = MATURITY_BETA;
-$plugin->release = "0.1.0";
-
-
-
-
+$plugin->release = "0.1.1";

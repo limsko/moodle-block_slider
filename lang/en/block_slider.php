@@ -24,21 +24,16 @@
 $string['pluginname'] = 'Slider';
 $string['slider:addinstance'] = 'Add a new Slider block';
 $string['slider:myaddinstance'] = 'Add a new Slider block to the My Moodle page';
-
 $string['header'] = 'Header of slider';
 $string['images'] = 'Slides Images';
-
 $string['width'] = 'Player base width';
 $string['height'] = 'Player base height';
-
 $string['nav'] = 'Navigation';
 $string['nav_desc'] = 'Enables/disables prev/next navigation below slider';
-
 $string['pag'] = 'Pagination';
 $string['pag_desc'] = 'Enables/disables pagination below slider';
-
+$string['auto_play'] = 'Auto play slides';
+$string['auto_play_desc'] = 'Enables/disables auto playing of slides';
 $string['effect'] = 'Slide Effect';
-
 $string['int'] = 'Slide interval in ms';
-
 $string['noimages'] = 'Please enter block config and add some images';

@@ -13,7 +13,6 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
-
 /**
  * Simple slider block for Moodle
  *
@@ -21,14 +20,12 @@
  * @copyright 2015 Kamil Łuczak    www.limsko.pl     kamil@limsko.pl
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 class block_slider_edit_form extends block_edit_form {
-    
+
     protected function specific_definition($mform) {
-        
+
         // Section header title according to language file.
         $mform->addElement('header', 'configheader', get_string('blocksettings', 'block'));
-        
         // A sample string variable with a default value.
         $mform->addElement('text', 'config_text', get_string('header', 'block_slider'));
         $mform->setDefault('config_text', '');
@@ -50,32 +47,31 @@ class block_slider_edit_form extends block_edit_form {
         $mform->setDefault('config_navigation', 1);
         $mform->addElement('advcheckbox', 'config_pagination', get_string('pag', 'block_slider'), get_string('pag_desc', 'block_slider'), array('group' => 1), array(0, 1));
         $mform->setDefault('config_pagination', 1);
+		  $mform->addElement('advcheckbox', 'config_autoplay', get_string('auto_play', 'block_slider'), get_string('auto_play_desc', 'block_slider'), array('group' => 1), array(0, 1));	
+        $mform->setDefault('config_autoplay', 1);
         $mform->addElement('filemanager', 'config_attachments', get_string('images', 'block_slider'), null,
         array('subdirs' => 0, 'maxbytes' => 5000000, 'maxfiles' => 10,
         'accepted_types' => array('.png', '.jpg', '.gif') ));
     }
-    
-    
+
     function set_data($defaults) {
-        
+
         if (empty($entry->id)) {
             $entry = new stdClass;
             $entry->id = null;
         }
-        
+
         $draftitemid = file_get_submitted_draft_itemid('config_attachments');
-        
+
         file_prepare_draft_area($draftitemid, $this->block->context->id, 'block_slider', 'content', 0,
         array('subdirs'=>true));
-        
+
         $entry->attachments = $draftitemid;
-        
+
         parent::set_data($defaults);
         if ($data = parent::get_data()) {
-            
             file_save_draft_area_files($data->config_attachments, $this->block->context->id, 'block_slider', 'content', 0, 
             array('subdirs' => true));
         }
     }
 }
-
