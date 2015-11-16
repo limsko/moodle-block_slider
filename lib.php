@@ -24,7 +24,7 @@
 
 function block_slider_pluginfile($course, $birecord_or_cm, $context, $filearea, $args, $forcedownload, array $options=array()) {
     global $DB, $CFG;
-	 
+
     if ($context->contextlevel != CONTEXT_BLOCK) {
         send_file_not_found();
     }
@@ -71,6 +71,6 @@ function block_slider_pluginfile($course, $birecord_or_cm, $context, $filearea, 
         $forcedownload = true;
     }
 
-    session_get_instance()->write_close();
+    \core\session\manager::write_close();
     send_stored_file($file, 60*60, 0, $forcedownload, $options);
 }

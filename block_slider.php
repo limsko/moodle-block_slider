@@ -33,17 +33,17 @@ class block_slider extends block_base {
       require_once($CFG->libdir . '/filelib.php');
       $this->page->requires->jquery();
       $this->page->requires->js('/blocks/slider/js/jquery.slides.js');
-		
+
 		if ($this->content !== null) {
       	return $this->content;
       }
 
       $this->content = new stdClass;
-		
+
 		if (!empty($this->config->text)) {
       	$this->content->text = $this->config->text;
 		} else {
-			$this->content->text = '';	
+			$this->content->text = '';
 		}
 
 		$this->content->text .= '<div class="slider"><div id="slides">';
@@ -63,7 +63,7 @@ class block_slider extends block_base {
       	$this->content->text .= '<a href="#" class="slidesjs-previous slidesjs-navigation"><i class="icon-chevron-left icon-large"></i></a>';
 			$this->content->text .= '<a href="#" class="slidesjs-next slidesjs-navigation"><i class="icon-chevron-right icon-large"></i></a>';
       }
-      
+
 		$this->content->text .= '</div></div>';
 
 		if (!empty($this->config->width) and is_numeric($this->config->width)) {
@@ -71,14 +71,14 @@ class block_slider extends block_base {
       } else {
       	$width = 940;
       }
-      
+
 		if (!empty($this->config->height) and is_numeric($this->config->height)) {
       	$height = $this->config->height;
       } else {
       	$height = 528;
       }
-			
-		if (!empty($this->config->interval) and is_numeric($this->config->interval)) {	
+
+		if (!empty($this->config->interval) and is_numeric($this->config->interval)) {
       	$interval = $this->config->interval;
       } else {
       	$interval = 5000;
@@ -142,7 +142,7 @@ $(function() {
 });
 </script>
 ';
-			
+
 		if (count($files) < 1 ) {
 			$this->content->text = get_string('noimages', 'block_slider');
 			$this->content->footer = '';
@@ -155,12 +155,13 @@ $(function() {
 		return true;
 	}
 	public function instance_allow_multiple() {
-		return false;
+		return true;
 	}
 	public function applicable_formats() {
   		return array(
   			'site' => true,
-  			'course-view' => true
+  			'course-view' => true,
+			'my'=> false
   		);
 	}
    public function hide_header() {
