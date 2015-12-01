@@ -152,7 +152,7 @@ $(function() {
 	}
 
    function has_config() {
-		return true;
+		return false;
 	}
 	public function instance_allow_multiple() {
 		return true;
