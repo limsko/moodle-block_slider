@@ -22,7 +22,8 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-function block_slider_pluginfile($course, $birecord_or_cm, $context, $filearea, $args, $forcedownload, array $options=array()) {
+function block_slider_pluginfile($course, $birecord_or_cm, $context, $filearea, $args, $forcedownload, array $options = array())
+{
     global $DB, $CFG;
 
     if ($context->contextlevel != CONTEXT_BLOCK) {
@@ -54,7 +55,7 @@ function block_slider_pluginfile($course, $birecord_or_cm, $context, $filearea, 
     $fs = get_file_storage();
 
     $filename = array_pop($args);
-    $filepath = $args ? '/'.implode('/', $args).'/' : '/';
+    $filepath = $args ? '/' . implode('/', $args) . '/' : '/';
 
     if (!$file = $fs->get_file($context->id, 'block_slider', 'content', 0, $filepath, $filename) or $file->is_directory()) {
         send_file_not_found();
@@ -72,5 +73,5 @@ function block_slider_pluginfile($course, $birecord_or_cm, $context, $filearea, 
     }
 
     \core\session\manager::write_close();
-    send_stored_file($file, 60*60, 0, $forcedownload, $options);
+    send_stored_file($file, 60 * 60, 0, $forcedownload, $options);
 }

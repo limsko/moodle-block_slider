@@ -31,7 +31,6 @@ Version history:
 0.1.2
 + added support for Moodle 3.0
 + now allowed multiple instances of block
-
-Thanks:
--------
-thanks to mudrd8mz for so detailed code review
+0.1.3
++ plugin is supported by Moodle 3.1, 3.2, 3.3, 3.4, 3.5
++ now using AMD format Javascript Modules
