@@ -17,20 +17,33 @@
 /**
  * Simple slider block for Moodle
  *
+ * If You like my plugin please send a small donation https://paypal.me/limsko Thanks!
+ *
  * @package   block_slider
- * @copyright 2015 Kamil Łuczak    www.limsko.pl     kamil@limsko.pl
+ * @copyright 2015-2020 Kamil Łuczak    www.limsko.pl     kamil@limsko.pl
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class block_slider extends block_base
-{
-    public function init()
-    {
+
+if (!defined('MOODLE_INTERNAL')) {
+    die('Direct access to this script is forbidden.'); // It must be included from a Moodle page.
+}
+
+/**
+ * Class block_slider
+ */
+class block_slider extends block_base {
+    public function init() {
         $this->title = get_string('pluginname', 'block_slider');
     }
 
-    public function get_content()
-    {
-        global $CFG;
+    /**
+     * @return stdClass|stdObject
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws moodle_exception
+     */
+    public function get_content() {
+        global $CFG, $DB;
         require_once($CFG->libdir . '/filelib.php');
 
         if ($this->content !== null) {
@@ -45,22 +58,31 @@ class block_slider extends block_base
             $this->content->text = '';
         }
 
-        $this->content->text .= '<div class="slider"><div id="slides">';
+        $this->content->text .= '<div class="slider"><div id="slides'.$this->instance->id.'" style="display: none;">';
 
-        //get and display images
-        $fs = get_file_storage();
-        $files = $fs->get_area_files($this->context->id, 'block_slider', 'content');
-        foreach ($files as $file) {
-            $filename = $file->get_filename();
-            if ($filename <> '.') {
-                $url = moodle_url::make_pluginfile_url($file->get_contextid(), $file->get_component(), $file->get_filearea(), null, $file->get_filepath(), $filename);
-                $this->content->text .= '<img src="' . $url . '" alt="' . $filename . '" />';
+        // Get and display images.
+        if ($slides = $DB->get_records('slider_slides', array('sliderid' => $this->instance->id), 'slide_order ASC')) {
+            foreach ($slides as $slide) {
+
+                $imageurl = $CFG->wwwroot . '/pluginfile.php/' . $this->context->id . '/block_slider/slider_slides/' . $slide->id .
+                        '/' . $slide->slide_image;
+                if (!empty($slide->slide_link)) {
+                    $this->content->text .= html_writer::start_tag('a', array('href' => $slide->slide_link, 'rel' => 'nofollow'));
+                }
+                $this->content->text .= html_writer::empty_tag('img',
+                        array('src' => $imageurl, 'class' => 'img-thumbnail', 'alt' => $slide->slide_image));
+                if (!empty($slide->slide_link)) {
+                    $this->content->text .= html_writer::end_tag('a');
+                }
             }
         }
-        //Navigation Left/Right
+
+        // Navigation Left/Right.
         if (!empty($this->config->navigation)) {
-            $this->content->text .= '<a href="#" class="slidesjs-previous slidesjs-navigation"><i class="icon fa fa-chevron-left icon-large" aria-hidden="true" aria-label="Prev"></i></a>';
-            $this->content->text .= '<a href="#" class="slidesjs-next slidesjs-navigation"><i class="icon fa fa-chevron-right icon-large" aria-hidden="true" aria-label="Next"></i></a>';
+            $this->content->text .= '<a href="#" class="slidesjs-previous slidesjs-navigation">
+    <i class="icon fa fa-chevron-left icon-large" aria-hidden="true" aria-label="Prev"></i></a>';
+            $this->content->text .= '<a href="#" class="slidesjs-next slidesjs-navigation">
+    <i class="icon fa fa-chevron-right icon-large" aria-hidden="true" aria-label="Next"></i></a>';
         }
 
         $this->content->text .= '</div></div>';
@@ -90,49 +112,76 @@ class block_slider extends block_base
         }
 
         if (!empty($this->config->pagination)) {
-            $pag = 'true';
+            $pag = true;
         } else {
-            $pag = 'false';
+            $pag = false;
         }
 
         if (!empty($this->config->autoplay)) {
-            $autoplay = 'true';
+            $autoplay = true;
         } else {
-            $autoplay = 'false';
+            $autoplay = false;
         }
 
         $nav = false;
 
-        $this->page->requires->js_call_amd('block_slider/slides', 'init', array($width, $height, $effect, $interval, $autoplay, $pag, $nav));
+        $this->page->requires->js_call_amd('block_slider/slides', 'init',
+                array($width, $height, $effect, $interval, $autoplay, $pag, $nav, $this->instance->id));
 
-        if (count($files) < 1) {
-            $this->content->text = get_string('noimages', 'block_slider');
+        // If user has capability of editing, add button.
+        if (has_capability('block/slider:manage', $this->context)) {
+            $editurl = new moodle_url('/blocks/slider/manage_images.php', array('sliderid' => $this->instance->id));
+            $this->content->footer = html_writer::tag('a', get_string('manage_slides', 'block_slider'),
+                    array('href' => $editurl, 'class' => 'btn btn-primary'));
         }
 
         return $this->content;
     }
 
-    function has_config()
-    {
+    /**
+     * @return bool
+     */
+    public function has_config() {
+        return false;
+    }
+
+    /**
+     * @return bool
+     */
+    public function instance_allow_multiple() {
         return true;
     }
 
-    public function instance_allow_multiple()
-    {
-        return true;
-    }
-
-    public function applicable_formats()
-    {
+    /**
+     * @return array
+     */
+    public function applicable_formats() {
         return array(
-            'site' => true,
-            'course-view' => true,
-            'my' => true
+                'site' => true,
+                'course-view' => true,
+                'my' => true
         );
     }
 
-    public function hide_header()
-    {
+    /**
+     * @return bool
+     * @throws dml_exception
+     */
+    public function instance_delete() {
+        global $CFG, $DB;
+        require_once($CFG->dirroot . '/blocks/slider/lib.php');
+        if ($slides = $DB->get_records('slider_slides', array('sliderid' => $this->instance->id))) {
+            foreach ($slides as $slide) {
+                block_slider_delete_slide($slide);
+            }
+        }
+        return true;
+    }
+
+    /**
+     * @return bool
+     */
+    public function hide_header() {
         global $PAGE;
         if ($PAGE->user_is_editing()) {
             return false;

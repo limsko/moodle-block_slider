@@ -22,8 +22,25 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-function block_slider_pluginfile($course, $birecord_or_cm, $context, $filearea, $args, $forcedownload, array $options = array())
-{
+if (!defined('MOODLE_INTERNAL')) {
+    die('Direct access to this script is forbidden.'); // It must be included from a Moodle page.
+}
+
+/**
+ * @param $course
+ * @param $birecordorcm
+ * @param $context
+ * @param $filearea
+ * @param $args
+ * @param $forcedownload
+ * @param array $options
+ * @throws coding_exception
+ * @throws dml_exception
+ * @throws moodle_exception
+ * @throws require_login_exception
+ * @throws required_capability_exception
+ */
+function block_slider_pluginfile($course, $birecordorcm, $context, $filearea, $args, $forcedownload, array $options = array()) {
     global $DB, $CFG;
 
     if ($context->contextlevel != CONTEXT_BLOCK) {
@@ -48,30 +65,58 @@ function block_slider_pluginfile($course, $birecord_or_cm, $context, $filearea, 
         // At this point there is no way to check SYSTEM or USER context, so ignoring it.
     }
 
-    if ($filearea !== 'content') {
+    if ($filearea !== 'content' && $filearea !== 'slider_slides') {
         send_file_not_found();
     }
 
     $fs = get_file_storage();
 
+    $itemid = array_shift($args);
     $filename = array_pop($args);
     $filepath = $args ? '/' . implode('/', $args) . '/' : '/';
 
-    if (!$file = $fs->get_file($context->id, 'block_slider', 'content', 0, $filepath, $filename) or $file->is_directory()) {
+    if (!$file = $fs->get_file($context->id, 'block_slider', $filearea, $itemid, $filepath, $filename) or $file->is_directory()) {
         send_file_not_found();
     }
 
-    if ($parentcontext = context::instance_by_id($birecord_or_cm->parentcontextid, IGNORE_MISSING)) {
+    if ($parentcontext = context::instance_by_id($birecordorcm->parentcontextid, IGNORE_MISSING)) {
         if ($parentcontext->contextlevel == CONTEXT_USER) {
-            // force download on all personal pages including /my/
-            //because we do not have reliable way to find out from where this is used
+            // Force download on all personal pages including /my/.
+            // Because we do not have reliable way to find out from where this is used.
             $forcedownload = true;
         }
     } else {
-        // weird, there should be parent context, better force dowload then
+        // Weird, there should be parent context, better force dowload then.
         $forcedownload = true;
     }
 
     \core\session\manager::write_close();
     send_stored_file($file, 60 * 60, 0, $forcedownload, $options);
+}
+
+function slider_donation_link() {
+    global $OUTPUT;
+    echo html_writer::start_div('span12')
+            . html_writer::empty_tag('br')
+            . html_writer::tag('p', get_string('donation', 'block_slider'))
+            . html_writer::tag('a', html_writer::empty_tag('img',
+                    array('src' => $OUTPUT->image_url('paypal', 'block_slider'), 'width' => '125')),
+                    array('href' => 'https://www.paypal.me/limsko', 'target' => '_blank'))
+            . html_writer::end_div();
+}
+
+/**
+ * @param $slide object
+ * @return bool
+ * @throws dml_exception
+ */
+function block_slider_delete_slide($slide) {
+    global $DB;
+    $fs = get_file_storage();
+    $context = context_block::instance($slide->sliderid);
+    if ($file = $fs->get_file($context->id, 'block_slider', 'slider_slides', $slide->id, '/', $slide->slide_image)) {
+        $file->delete();
+    }
+    $DB->delete_records('slider_slides', array('id' => $slide->id));
+    return true;
 }
