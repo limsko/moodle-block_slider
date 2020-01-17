@@ -117,11 +117,24 @@ function slider_donation_link() {
  */
 function block_slider_delete_slide($slide) {
     global $DB;
-    $fs = get_file_storage();
-    $context = context_block::instance($slide->sliderid);
-    if ($file = $fs->get_file($context->id, 'block_slider', 'slider_slides', $slide->id, '/', $slide->slide_image)) {
-        $file->delete();
-    }
+    block_slider_delete_image($slide->sliderid, $slide->id, $slide->slide_image);
     $DB->delete_records('slider_slides', array('id' => $slide->id));
     return true;
+}
+
+/**
+ * @param $sliderid int Slider ID number
+ * @param $slideid int Slide ID
+ * @param $slideimage string Slide image name
+ */
+function block_slider_delete_image($sliderid, $slideid, $slideimage = null){
+    global $DB;
+    $fs = get_file_storage();
+    $context = context_block::instance($sliderid);
+    if(!$slideimage) {
+        $slideimage = $DB->get_field('slider_slides', 'slide_image', array('sliderid'=>$sliderid, 'id'=>$slideid));
+    }
+    if ($file = $fs->get_file($context->id, 'block_slider', 'slider_slides', $slideid, '/', $slideimage)) {
+        $file->delete();
+    }
 }

@@ -92,7 +92,7 @@ function xmldb_block_slider_upgrade($oldversion) {
 
         upgrade_plugin_savepoint(true, 2020011302, 'block', 'slider');
     }
-    
+
     if ($oldversion < 2020011800) {
         upgrade_plugin_savepoint(true, 2020011800, 'block', 'slider');
     }

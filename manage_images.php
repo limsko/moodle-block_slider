@@ -61,8 +61,10 @@ if ($mform->is_cancelled()) {
 
     // Editing or adding new slide.
     if (!empty($fromform->id) and $data->id = $DB->get_field($dtable, 'id', array('id' => $fromform->id))) {
-        $id = $DB->update_record($dtable, $data);
+        $editing = 1;
+        $DB->update_record($dtable, $data);
     } else {
+        $editing = 0;
         $id = $DB->insert_record($dtable, $data);
     }
 
@@ -70,8 +72,11 @@ if ($mform->is_cancelled()) {
     $content = $mform->get_file_content('slide_image');
     $name = $mform->get_new_filename('slide_image');
     if ($content && $name) {
+        // First delete old image
+        if($editing === 1) {
+            block_slider_delete_image($data->sliderid, $id);
+        }
         $filename = strtolower($name);
-
         $fs = get_file_storage();
         $fileinfo = array(
                 'contextid' => $context->id,
