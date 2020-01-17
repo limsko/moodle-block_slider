@@ -82,10 +82,7 @@ if ($mform->is_cancelled()) {
                 'filename' => $filename);
         $fs->create_file_from_string($fileinfo, $content);
 
-
-
         /* todo: Thumbnail generation. */
-
         $data->id = $id;
         $data->slide_image = $filename;
         $id = $DB->update_record($dtable, $data);

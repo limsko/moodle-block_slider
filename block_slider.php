@@ -70,7 +70,7 @@ class block_slider extends block_base {
                     $this->content->text .= html_writer::start_tag('a', array('href' => $slide->slide_link, 'rel' => 'nofollow'));
                 }
                 $this->content->text .= html_writer::empty_tag('img',
-                        array('src' => $imageurl, 'class' => 'img-thumbnail', 'alt' => $slide->slide_image));
+                        array('src' => $imageurl, 'class' => 'img', 'alt' => $slide->slide_image));
                 if (!empty($slide->slide_link)) {
                     $this->content->text .= html_writer::end_tag('a');
                 }

@@ -28,6 +28,6 @@ if (!defined('MOODLE_INTERNAL')) {
 
 $plugin->version = 2020011600;
 $plugin->requires = 2016052312;
-$plugin->maturity = MATURITY_BETA;
-$plugin->release = "0.2.1";
+$plugin->maturity = MATURITY_RC;
+$plugin->release = "0.2.2";
 $plugin->component = 'block_slider';

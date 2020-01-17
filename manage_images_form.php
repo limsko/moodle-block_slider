@@ -35,6 +35,10 @@ require_once($CFG->dirroot . '/lib/formslib.php');
  */
 class add_slider_image extends moodleform {
 
+    /**
+     * @throws coding_exception
+     * @throws dml_exception
+     */
     public function definition() {
         global $CFG, $DB;
 
@@ -93,7 +97,11 @@ class add_slider_image extends moodleform {
         $this->add_action_buttons();
     }
 
-    // Custom validation should be added here.
+    /**
+     * @param array $data
+     * @param array $files
+     * @return array
+     */
     public function validation($data, $files) {
         return array();
     }

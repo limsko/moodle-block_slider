@@ -94,6 +94,11 @@ function block_slider_pluginfile($course, $birecordorcm, $context, $filearea, $a
     send_stored_file($file, 60 * 60, 0, $forcedownload, $options);
 }
 
+/**
+ * Displays paypal donation link
+ *
+ * @throws coding_exception
+ */
 function slider_donation_link() {
     global $OUTPUT;
     echo html_writer::start_div('span12')
