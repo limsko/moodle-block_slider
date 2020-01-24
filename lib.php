@@ -18,7 +18,7 @@
  * Simple slider block for Moodle
  *
  * @package   block_slider
- * @copyright 2015 Kamil Łuczak    www.limsko.pl     kamil@limsko.pl
+ * @copyright 2015-2020 Kamil Łuczak    www.limsko.pl     kamil@limsko.pl
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -27,6 +27,8 @@ if (!defined('MOODLE_INTERNAL')) {
 }
 
 /**
+ * Block slider file function.
+ *
  * @param $course
  * @param $birecordorcm
  * @param $context
@@ -111,6 +113,8 @@ function slider_donation_link() {
 }
 
 /**
+ * Function for deleting slide with their images.
+ *
  * @param $slide object
  * @return bool
  * @throws dml_exception
@@ -123,18 +127,36 @@ function block_slider_delete_slide($slide) {
 }
 
 /**
+ * Deletes images in selected slider.
+ *
  * @param $sliderid int Slider ID number
  * @param $slideid int Slide ID
  * @param $slideimage string Slide image name
+ * @throws dml_exception
  */
-function block_slider_delete_image($sliderid, $slideid, $slideimage = null){
+function block_slider_delete_image($sliderid, $slideid, $slideimage = null) {
     global $DB;
     $fs = get_file_storage();
     $context = context_block::instance($sliderid);
-    if(!$slideimage) {
-        $slideimage = $DB->get_field('slider_slides', 'slide_image', array('sliderid'=>$sliderid, 'id'=>$slideid));
+    if (!$slideimage) {
+        $slideimage = $DB->get_field('slider_slides', 'slide_image', array('sliderid' => $sliderid, 'id' => $slideid));
     }
     if ($file = $fs->get_file($context->id, 'block_slider', 'slider_slides', $slideid, '/', $slideimage)) {
         $file->delete();
     }
+}
+
+function bxslider_get_settings($config, $sliderid) {
+    $bxpause = isset($config->interval) ? $config->interval : 5000;
+    $bxeffect = isset($config->bx_effect) ? $config->bx_effect : 'fade';
+    $bxspeed = isset($config->bx_speed) ? $config->bx_speed : 500;
+    $bxcaptions = isset($config->bx_captions) ? $config->bx_captions : 0;
+    $bxresponsive = isset($config->bx_responsive) ? $config->bx_responsive : 1;
+    $bxpager = isset($config->bx_pager) ? $config->bx_pager : 1;
+    $bxcontrols = isset($config->bx_controls) ? $config->bx_controls : 1;
+    $bxauto = isset($config->bx_auto) ? $config->bx_auto : 1;
+    $bxstopautoonclick = isset($config->bx_stopAutoOnClick) ? $config->bx_stopAutoOnClick : 0;
+    $bxusecss = isset($config->bx_useCSS) ? $config->bx_useCSS : 0;
+    return array($sliderid, $bxpause, $bxeffect, $bxspeed, boolval($bxcaptions), boolval($bxresponsive), boolval($bxpager),
+            boolval($bxcontrols), boolval($bxauto), boolval($bxstopautoonclick), boolval($bxusecss));
 }

@@ -52,3 +52,5 @@ $string['confirm_deletion'] = 'Czy na pewno chcesz usunąć ten slajd?';
 $string['deleted'] = 'Slajd został usunięty';
 $string['new_slide_image'] = 'Załaduj nową grafikę';
 $string['donation'] = 'Jeśli spodobał Ci się mój plugin, będę wdzięczny, jeśli wyślesz mi małą darowiznę.';
+$string['slidesjs_h1'] = 'Ustawienia SlideJS';
+$string['bxslider_h1'] = 'Ustawienia BXSlider';

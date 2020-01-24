@@ -32,25 +32,38 @@ if (!defined('MOODLE_INTERNAL')) {
  * Class block_slider
  */
 class block_slider extends block_base {
+
+    /**
+     * Initializes block.
+     *
+     * @throws coding_exception
+     */
     public function init() {
         $this->title = get_string('pluginname', 'block_slider');
     }
 
     /**
+     * Returns content of block.
+     *
      * @return stdClass|stdObject
      * @throws coding_exception
      * @throws dml_exception
      * @throws moodle_exception
      */
     public function get_content() {
-        global $CFG, $DB;
+        global $CFG, $DB, $bxs;
         require_once($CFG->libdir . '/filelib.php');
+        require_once($CFG->dirroot . '/blocks/slider/lib.php');
 
         if ($this->content !== null) {
             return $this->content;
         }
 
         $this->content = new stdClass;
+        $bxslider = false;
+        if (trim($this->config->slider_js) === 'bxslider') {
+            $bxslider = true;
+        }
 
         if (!empty($this->config->text)) {
             $this->content->text = $this->config->text;
@@ -58,27 +71,44 @@ class block_slider extends block_base {
             $this->content->text = '';
         }
 
-        $this->content->text .= '<div class="slider"><div id="slides'.$this->instance->id.'" style="display: none;">';
+        if (!isset($bxs)) {
+            $bxs = 1;
+        } else {
+            $bxs++;
+        }
+        $this->content->text .= '<div class="slider"><div id="slides' . $this->instance->id . $bxs . '" ';
+
+        if (!$bxslider) {
+            $this->content->text .= 'style="display: none;"';
+        } else {
+            $this->content->text .= 'class="bxslider bxslider' . $this->instance->id . $bxs . '" style="visibility: hidden;"';
+        }
+        $this->content->text .= '>';
 
         // Get and display images.
         if ($slides = $DB->get_records('slider_slides', array('sliderid' => $this->instance->id), 'slide_order ASC')) {
             foreach ($slides as $slide) {
-
+                if ($bxslider) {
+                    $this->content->text .= html_writer::start_tag('div');
+                }
                 $imageurl = $CFG->wwwroot . '/pluginfile.php/' . $this->context->id . '/block_slider/slider_slides/' . $slide->id .
                         '/' . $slide->slide_image;
                 if (!empty($slide->slide_link)) {
                     $this->content->text .= html_writer::start_tag('a', array('href' => $slide->slide_link, 'rel' => 'nofollow'));
                 }
                 $this->content->text .= html_writer::empty_tag('img',
-                        array('src' => $imageurl, 'class' => 'img', 'alt' => $slide->slide_image));
+                        array('src' => $imageurl, 'class' => 'img', 'alt' => $slide->slide_image, 'title' => $slide->slide_title));
                 if (!empty($slide->slide_link)) {
                     $this->content->text .= html_writer::end_tag('a');
+                }
+                if ($bxslider) {
+                    $this->content->text .= html_writer::end_tag('div');
                 }
             }
         }
 
         // Navigation Left/Right.
-        if (!empty($this->config->navigation)) {
+        if (!empty($this->config->navigation) && !$bxslider) {
             $this->content->text .= '<a href="#" class="slidesjs-previous slidesjs-navigation">
     <i class="icon fa fa-chevron-left icon-large" aria-hidden="true" aria-label="Prev"></i></a>';
             $this->content->text .= '<a href="#" class="slidesjs-next slidesjs-navigation">
@@ -125,20 +155,28 @@ class block_slider extends block_base {
 
         $nav = false;
 
-        $this->page->requires->js_call_amd('block_slider/slides', 'init',
-                array($width, $height, $effect, $interval, $autoplay, $pag, $nav, $this->instance->id));
+        if ($bxslider) {
+            $this->page->requires->js_call_amd('block_slider/bxslider', 'init',
+                    bxslider_get_settings($this->config, $this->instance->id . $bxs));
 
+        } else {
+            $this->page->requires->js_call_amd('block_slider/slides', 'init',
+                    array($width, $height, $effect, $interval, $autoplay, $pag, $nav, $this->instance->id . $bxs));
+        }
         // If user has capability of editing, add button.
         if (has_capability('block/slider:manage', $this->context)) {
             $editurl = new moodle_url('/blocks/slider/manage_images.php', array('sliderid' => $this->instance->id));
             $this->content->footer = html_writer::tag('a', get_string('manage_slides', 'block_slider'),
                     array('href' => $editurl, 'class' => 'btn btn-primary'));
+
         }
 
         return $this->content;
     }
 
     /**
+     * This plugin has no global config.
+     *
      * @return bool
      */
     public function has_config() {
@@ -146,6 +184,8 @@ class block_slider extends block_base {
     }
 
     /**
+     * We are legion.
+     *
      * @return bool
      */
     public function instance_allow_multiple() {
@@ -153,6 +193,8 @@ class block_slider extends block_base {
     }
 
     /**
+     * Where we can add the block?
+     *
      * @return array
      */
     public function applicable_formats() {
@@ -164,6 +206,8 @@ class block_slider extends block_base {
     }
 
     /**
+     * What happens when instance of block is deleted.
+     *
      * @return bool
      * @throws dml_exception
      */
@@ -179,6 +223,8 @@ class block_slider extends block_base {
     }
 
     /**
+     * Hide header of this block.
+     *
      * @return bool
      */
     public function hide_header() {

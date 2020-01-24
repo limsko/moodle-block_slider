@@ -15,9 +15,13 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Test table class to be put in test_table.php of root of Moodle installation.
- *  for defining some custom column names and proccessing
- * Username and Password feilds using custom and other column methods.
+ * Simple slider block for Moodle
+ *
+ * If You like my plugin please send a small donation https://paypal.me/limsko Thanks!
+ *
+ * @package   block_slider
+ * @copyright 2015-2020 Kamil Łuczak    www.limsko.pl     kamil@limsko.pl
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 if (!defined('MOODLE_INTERNAL')) {
@@ -58,12 +62,10 @@ class manage_images extends table_sql {
     }
 
     /**
-     * This function is called for each data row to allow processing of the
-     * username value.
+     * Column with slide image.
      *
-     * @param object $values Contains object with all the values of record.
-     * @return $string Return username with link to profile or username only.
-     *     when downloading.
+     * @param $values
+     * @return string
      */
     public function col_slide_image($values) {
         global $CFG, $context;
@@ -74,8 +76,10 @@ class manage_images extends table_sql {
     }
 
     /**
-     * @param object $values Contains object with all the values of record.
-     * @return string Returns buttons.
+     * Column with manage buttons.
+     *
+     * @param $values
+     * @return string
      * @throws coding_exception
      * @throws moodle_exception
      */

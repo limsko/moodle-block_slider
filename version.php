@@ -18,7 +18,7 @@
  * Simple slider block for Moodle
  *
  * @package   block_slider
- * @copyright 2018-2020 Kamil Łuczak    www.limsko.pl     kamil@limsko.pl
+ * @copyright 2015-2020 Kamil Łuczak    www.limsko.pl     kamil@limsko.pl
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -26,8 +26,8 @@ if (!defined('MOODLE_INTERNAL')) {
     die('Direct access to this script is forbidden.'); // It must be included from a Moodle page.
 }
 
-$plugin->version = 2020011800;
+$plugin->version = 2020012400;
 $plugin->requires = 2016052312;
-$plugin->maturity = MATURITY_RC;
-$plugin->release = "0.2.2";
+$plugin->maturity = MATURITY_BETA;
+$plugin->release = "0.3.0";
 $plugin->component = 'block_slider';

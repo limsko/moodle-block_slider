@@ -72,8 +72,8 @@ if ($mform->is_cancelled()) {
     $content = $mform->get_file_content('slide_image');
     $name = $mform->get_new_filename('slide_image');
     if ($content && $name) {
-        // First delete old image
-        if($editing === 1) {
+        // First delete old image.
+        if ($editing === 1) {
             block_slider_delete_image($data->sliderid, $id);
         }
         $filename = strtolower($name);

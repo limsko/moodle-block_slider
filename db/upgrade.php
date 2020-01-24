@@ -26,9 +26,16 @@
 defined('MOODLE_INTERNAL') || die();
 
 /**
+ * Upgrading block function.
+ *
  * @param $oldversion
  * @return bool
+ * @throws coding_exception
+ * @throws ddl_exception
+ * @throws dml_exception
  * @throws downgrade_exception
+ * @throws file_exception
+ * @throws stored_file_creation_exception
  * @throws upgrade_exception
  */
 function xmldb_block_slider_upgrade($oldversion) {
