@@ -18,14 +18,20 @@
  * Simple slider block for Moodle
  *
  * @package   block_slider
- * @copyright 2015 Kamil Łuczak    www.limsko.pl     kamil@limsko.pl
+ * @copyright 2015-2020 Kamil Łuczak    www.limsko.pl     kamil@limsko.pl
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 $string['pluginname'] = 'Slider';
 $string['slider:addinstance'] = 'Add a new Slider block';
 $string['slider:myaddinstance'] = 'Add a new Slider block to the My Moodle page';
-$string['header'] = 'Header of slider';
-$string['images'] = 'Slides Images';
+$string['slider:manage'] = 'Manage slider';
+$string['header'] = 'Slider header';
+$string['privacy:metadata:block'] = 'Slider stores some of its data within the block subsystem.';
+$string['privacy:metadata:slider_slides'] = 'Block slider stores most of its data inside slider_slides database table.';
+$string['privacy:metadata:slide_title'] = 'User created slide title';
+$string['privacy:metadata:slide_desc'] = 'User created slide description';
+$string['privacy:metadata:slide_link'] = 'User created slide link';
+$string['privacy:metadata:slide_image'] = 'User uploaded slide image';
 $string['config_width'] = 'Player base width in px';
 $string['config_height'] = 'Player base height in px';
 $string['config_width_help'] = 'Best is to use images original width';
@@ -47,6 +53,7 @@ $string['slide_title'] = 'Slide Title';
 $string['slide_desc'] = 'Slide Description';
 $string['slide_order'] = 'Slide Order';
 $string['slide_image'] = 'Slide Image';
+$string['slider_id_for_filter'] = '<i class="fa fa-icon fa-info-circle"></i> Use <code>[SLIDER-{$a}]</code> if You want to display this Slider with Filter Slider.';
 $string['saved'] = 'Slide saved';
 $string['slider_js'] = 'Slider JS library';
 $string['confirm_deletion'] = 'Do You really want to delete this slide?';

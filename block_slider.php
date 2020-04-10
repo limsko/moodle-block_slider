@@ -61,7 +61,7 @@ class block_slider extends block_base {
 
         $this->content = new stdClass;
         $bxslider = false;
-        if (trim($this->config->slider_js) === 'bxslider') {
+        if (isset($this->config->slider_js) && trim($this->config->slider_js) === 'bxslider') {
             $bxslider = true;
         }
 
@@ -165,7 +165,11 @@ class block_slider extends block_base {
         }
         // If user has capability of editing, add button.
         if (has_capability('block/slider:manage', $this->context)) {
-            $editurl = new moodle_url('/blocks/slider/manage_images.php', array('sliderid' => $this->instance->id));
+            $instance_array = array('sliderid' => $this->instance->id);
+            if (isset($this->page->course->id)) {
+                $instance_array['course'] = $this->page->course->id;
+            }
+            $editurl = new moodle_url('/blocks/slider/manage_images.php', $instance_array);
             $this->content->footer = html_writer::tag('a', get_string('manage_slides', 'block_slider'),
                     array('href' => $editurl, 'class' => 'btn btn-primary'));
 

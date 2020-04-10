@@ -29,12 +29,19 @@ require_once('../../config.php');
 require_login();
 
 require_once($CFG->libdir . '/tablelib.php');
+require_once($CFG->libdir . '/filterlib.php');
 require_once('manage_images_table.php');
 require_once('lib.php');
 
 $sliderid = required_param('sliderid', PARAM_INT);
 $id = optional_param('id', null, PARAM_INT);
+$courseid = optional_param('course', null, PARAM_INT);
 $baseurl = new moodle_url('/blocks/slider/manage_images.php', array('view' => 'manage', 'sliderid' => $sliderid));
+if ($courseid) {
+    if ($course = get_course($courseid)) {
+        $PAGE->set_course($course);
+    }
+}
 $PAGE->navbar->add(get_string('manage_slides', 'block_slider'), $baseurl);
 
 require_once('manage_images_form.php');
@@ -100,6 +107,11 @@ if ($mform->is_cancelled()) {
 } else {
 
     echo $OUTPUT->header();
+
+    // Display Slider ID is Filter is enabled.
+    if (filter_is_enabled('slider')) {
+        echo html_writer::tag('p', get_string('slider_id_for_filter', 'block_slider', $sliderid), ['class' => 'lead']);
+    }
 
     if (!$id) {
         // Slides table.

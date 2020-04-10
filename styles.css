@@ -173,7 +173,7 @@
 /* DIRECTION CONTROLS (NEXT / PREV) */
 .block_slider .bx-wrapper .bx-prev {
     left: 10px;
-    background: url([[pix:block_slider|controls.png]]) no-repeat 0 -32px;
+    background: url([[pix:block_slider|controls]]) no-repeat 0 -32px;
 }
 
 .block_slider .bx-wrapper .bx-prev:hover,

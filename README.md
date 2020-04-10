@@ -9,8 +9,8 @@ It should work with all bootstrap based themes.
 
 You can choose between two types of slider library, control effects and settings.
 
-##Installation:
-Install using Moodle backend panel as described on https://docs.moodle.org/38/en/Installing_plugins
+## Installation:
+Install using Moodle backend panel as described on http://docs.moodle.org/en/Installing_plugins
 
 Download, extract, and upload the "slider" folder into moodle/blocks/
 
@@ -18,6 +18,17 @@ Download, extract, and upload the "slider" folder into moodle/blocks/
 I have tested plugin on clean install of Moodle 3.1 - 3.8
 
 ## Version history:
+
+### 0.3.2
+* added information with filter_slider code above slides table, when filter_slider is enabled
+    https://github.com/limsko/moodle-block_slider/issues/14
+* fixed issues
+    https://github.com/limsko/moodle-block_slider/issues/12
+    https://github.com/limsko/moodle-block_slider/issues/13
+* fixed lack of course link in navbar when managing slides inside course
+    
+### 0.3.1
+* fixed missing prev button graphics on bxslider
 
 ### 0.3.0
 * added new slider js library - BX Slider

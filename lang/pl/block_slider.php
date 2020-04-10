@@ -18,12 +18,13 @@
  * Simple slider block for Moodle
  *
  * @package   block_slider
- * @copyright 2015 Kamil Łuczak    www.limsko.pl     kamil@limsko.pl
+ * @copyright 2015-2020 Kamil Łuczak    www.limsko.pl     kamil@limsko.pl
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 $string['pluginname'] = 'Slajder';
 $string['slider:addinstance'] = 'Dodaj nowy Slajder';
 $string['slider:myaddinstance'] = 'Dodaj nowy Slajder do mojej strony Moodle';
+$string['slider:manage'] = 'Zarządzaj slajderem';
 $string['header'] = 'Nagłówek slidera';
 $string['images'] = 'Grafiki slidera';
 $string['config_width'] = 'Bazowa szerokość w px';
@@ -54,3 +55,4 @@ $string['new_slide_image'] = 'Załaduj nową grafikę';
 $string['donation'] = 'Jeśli spodobał Ci się mój plugin, będę wdzięczny, jeśli wyślesz mi małą darowiznę.';
 $string['slidesjs_h1'] = 'Ustawienia SlideJS';
 $string['bxslider_h1'] = 'Ustawienia BXSlider';
+$string['slider_id_for_filter'] = '<i class="fa fa-icon fa-info-circle"></i> Użyj kodu <code>[SLIDER-{$a}]</code> aby umieścić ten slajder za pomocą Filtru Slider.';
