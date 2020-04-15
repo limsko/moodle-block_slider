@@ -354,14 +354,14 @@ define(["jquery"], function ($) {
                 }
                 slidesControl.on("transitionend webkitTransitionEnd oTransitionEnd " +
                     "otransitionend MSTransitionEnd", function () {
-                    prefix = _this.data.vendorPrefix;
-                    transform = prefix + "Transform";
-                    duration = prefix + "TransitionDuration";
-                    timing = prefix + "TransitionTimingFunction";
-                    slidesControl[0].style[transform] = "";
-                    slidesControl[0].style[duration] = "";
-                    slidesControl[0].style[timing] = ""; // Removed return.
-                });
+                        prefix = _this.data.vendorPrefix;
+                        transform = prefix + "Transform";
+                        duration = prefix + "TransitionDuration";
+                        timing = prefix + "TransitionTimingFunction";
+                        slidesControl[0].style[transform] = "";
+                        slidesControl[0].style[duration] = "";
+                        slidesControl[0].style[timing] = ""; // Removed return.
+                    });
                 return e.stopPropagation();
             };
             Plugin.prototype._touchmove = function (e) {
@@ -493,30 +493,30 @@ define(["jquery"], function ($) {
                         slidesControl[0].style[duration] = this.options.effect.slide.speed + "ms";
                         return slidesControl.on("transitionend webkitTransitionEnd oTransitionEnd " +
                             "otransitionend MSTransitionEnd", function () {
-                            slidesControl[0].style[transform] = "";
-                            slidesControl[0].style[duration] = "";
-                            slidesControl.children(":eq(" + next + ")").css({
-                                left: 0
+                                slidesControl[0].style[transform] = "";
+                                slidesControl[0].style[duration] = "";
+                                slidesControl.children(":eq(" + next + ")").css({
+                                    left: 0
+                                });
+                                slidesControl.children(":eq(" + currentSlide + ")").css({
+                                    display: "none",
+                                    left: 0,
+                                    zIndex: 0
+                                });
+                                $.data(_this, "current", next);
+                                $.data(_this, "animating", false);
+                                slidesControl.unbind("transitionend webkitTransitionEnd oTransitionEnd " +
+                                    "otransitionend MSTransitionEnd");
+                                slidesControl.children(":not(:eq(" + next + "))").css({
+                                    display: "none",
+                                    left: 0,
+                                    zIndex: 0
+                                });
+                                if (_this.data.touch) {
+                                    _this._setuptouch();
+                                }
+                                return _this.options.callback.complete(next + 1);
                             });
-                            slidesControl.children(":eq(" + currentSlide + ")").css({
-                                display: "none",
-                                left: 0,
-                                zIndex: 0
-                            });
-                            $.data(_this, "current", next);
-                            $.data(_this, "animating", false);
-                            slidesControl.unbind("transitionend webkitTransitionEnd oTransitionEnd " +
-                                "otransitionend MSTransitionEnd");
-                            slidesControl.children(":not(:eq(" + next + "))").css({
-                                display: "none",
-                                left: 0,
-                                zIndex: 0
-                            });
-                            if (_this.data.touch) {
-                                _this._setuptouch();
-                            }
-                            return _this.options.callback.complete(next + 1);
-                        });
                     } else {
                         return slidesControl.stop().animate({
                             left: direction
@@ -528,11 +528,11 @@ define(["jquery"], function ($) {
                                 left: 0
                             });
                             return slidesControl.children(":eq(" + currentSlide + ")").css({
-                                    display: "none",
-                                    left: 0,
-                                    zIndex: 0
-                                }, $.data(_this, "current", next), $.data(_this, "animating", false),
-                                _this.options.callback.complete(next + 1));
+                                display: "none",
+                                left: 0,
+                                zIndex: 0
+                            }, $.data(_this, "current", next), $.data(_this, "animating", false),
+                            _this.options.callback.complete(next + 1));
                         }));
                     }
                 }
@@ -572,27 +572,27 @@ define(["jquery"], function ($) {
                             ")").stop().fadeOut(this.options.effect.fade.speed);
                         return slidesControl.children(":eq(" + next +
                             ")").stop().fadeIn(this.options.effect.fade.speed, (function () {
-                            slidesControl.children(":eq(" + next + ")").css({
-                                zIndex: 0
-                            });
-                            $.data(_this, "animating", false);
-                            $.data(_this, "current", next);
-                            return _this.options.callback.complete(next + 1);
-                        }));
+                                slidesControl.children(":eq(" + next + ")").css({
+                                    zIndex: 0
+                                });
+                                $.data(_this, "animating", false);
+                                $.data(_this, "current", next);
+                                return _this.options.callback.complete(next + 1);
+                            }));
                     } else {
                         return slidesControl.children(":eq(" + currentSlide +
                             ")").stop().fadeOut(this.options.effect.fade.speed, (function () {
-                            slidesControl.children(":eq(" + next +
-                                ")").stop().fadeIn(_this.options.effect.fade.speed, (function () {
-                                return slidesControl.children(":eq(" + next +
-                                    ")").css({
-                                    zIndex: 10
-                                });
+                                slidesControl.children(":eq(" + next +
+                                    ")").stop().fadeIn(_this.options.effect.fade.speed, (function () {
+                                        return slidesControl.children(":eq(" + next +
+                                            ")").css({
+                                                zIndex: 10
+                                            });
+                                    }));
+                                $.data(_this, "animating", false);
+                                $.data(_this, "current", next);
+                                return _this.options.callback.complete(next + 1);
                             }));
-                            $.data(_this, "animating", false);
-                            $.data(_this, "current", next);
-                            return _this.options.callback.complete(next + 1);
-                        }));
                     }
                 }
             };

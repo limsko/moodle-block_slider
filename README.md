@@ -19,6 +19,9 @@ I have tested plugin on clean install of Moodle 3.1 - 3.8
 
 ## Version history:
 
+### 0.3.3
+* minor fixes in privacy subsystem implementation
+
 ### 0.3.2
 * added information with filter_slider code above slides table, when filter_slider is enabled
     https://github.com/limsko/moodle-block_slider/issues/14

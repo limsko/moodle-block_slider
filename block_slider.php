@@ -165,11 +165,11 @@ class block_slider extends block_base {
         }
         // If user has capability of editing, add button.
         if (has_capability('block/slider:manage', $this->context)) {
-            $instance_array = array('sliderid' => $this->instance->id);
+            $instancearray = array('sliderid' => $this->instance->id);
             if (isset($this->page->course->id)) {
-                $instance_array['course'] = $this->page->course->id;
+                $instancearray['course'] = $this->page->course->id;
             }
-            $editurl = new moodle_url('/blocks/slider/manage_images.php', $instance_array);
+            $editurl = new moodle_url('/blocks/slider/manage_images.php', $instancearray);
             $this->content->footer = html_writer::tag('a', get_string('manage_slides', 'block_slider'),
                     array('href' => $editurl, 'class' => 'btn btn-primary'));
 

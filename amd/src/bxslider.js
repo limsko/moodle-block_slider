@@ -1552,9 +1552,9 @@ define(["jquery"], function ($) {
                         // Fade in the newly requested slide.
                         slider.children.eq(slider.active.index).css('zIndex',
                             slider.settings.slideZIndex + 1).fadeIn(slider.settings.speed, function () {
-                            $(this).css('zIndex', slider.settings.slideZIndex);
-                            updateAfterSlideTransition();
-                        });
+                                $(this).css('zIndex', slider.settings.slideZIndex);
+                                updateAfterSlideTransition();
+                            });
                         // Slider mode is not "fade".
                     } else {
                         // If adaptiveHeight is true and next height is different from current height, animate to the new height.
