@@ -627,7 +627,7 @@ define(["jquery"], function ($) {
         init: function (width, height, effect, interval, autoplay, pag, nav, sliderid) {
 
             $(function () {
-                $(".bxslider" + sliderid).slidesjs({
+                $(".slides" + sliderid).slidesjs({
                     width: width,
                     height: height,
                     navigation: {

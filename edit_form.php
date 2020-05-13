@@ -94,6 +94,16 @@ class block_slider_edit_form extends block_edit_form {
         $mform->setDefault('config_bx_captions', 0);
         $mform->addHelpButton('config_bx_captions', 'config_bx_captions', 'block_slider');
 
+        $mform->addElement('select', 'config_bx_displaydesc', get_string('config_bx_displaydesc', 'block_slider'),
+                array(1 => get_string('yes'), 0 => get_string('no')), null);
+        $mform->setDefault('config_bx_displaydesc', 0);
+        $mform->addHelpButton('config_bx_displaydesc', 'config_bx_displaydesc', 'block_slider');
+
+        $mform->addElement('select', 'config_bx_hideonhover', get_string('config_bx_hideonhover', 'block_slider'),
+                array(1 => get_string('yes'), 0 => get_string('no')), null);
+        $mform->setDefault('config_bx_hideonhover', 0);
+        $mform->addHelpButton('config_bx_hideonhover', 'config_bx_hideonhover', 'block_slider');
+
         $mform->addElement('select', 'config_bx_responsive', get_string('config_bx_responsive', 'block_slider'),
                 array(1 => get_string('yes'), 0 => get_string('no')), null);
         $mform->setDefault('config_bx_captions', 1);

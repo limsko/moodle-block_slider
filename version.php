@@ -26,8 +26,8 @@ if (!defined('MOODLE_INTERNAL')) {
     die('Direct access to this script is forbidden.'); // It must be included from a Moodle page.
 }
 
-$plugin->version = 2020041500;
+$plugin->version = 2020051300;
 $plugin->requires = 2016052312;
 $plugin->maturity = MATURITY_BETA;
-$plugin->release = "0.3.3";
+$plugin->release = "0.4.0";
 $plugin->component = 'block_slider';

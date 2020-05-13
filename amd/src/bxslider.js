@@ -13,7 +13,6 @@ define(["jquery"], function ($) {
      * Written while drinking Belgian ales and listening to jazz
      * Licensed under MIT (http://opensource.org/licenses/MIT).
      */
-
     (function () {
         (function ($) {
             var defaults = {
@@ -1851,6 +1850,7 @@ define(["jquery"], function ($) {
                     controls: bx_controls,
                     auto: bx_auto,
                     stopAutoOnClick: bx_stopAutoOnClick,
+                    stopAuto: false, // This is fix for not stopping auto?
                     useCSS: bx_useCSS,
                     onSliderLoad: function () {
                         $("#slides" + sliderid).css("visibility", "visible");

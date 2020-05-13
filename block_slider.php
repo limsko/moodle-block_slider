@@ -33,12 +33,15 @@ if (!defined('MOODLE_INTERNAL')) {
  */
 class block_slider extends block_base {
 
+    public $hasslides = false;
+
     /**
      * Initializes block.
      *
      * @throws coding_exception
      */
     public function init() {
+        global $DB;
         $this->title = get_string('pluginname', 'block_slider');
     }
 
@@ -57,6 +60,11 @@ class block_slider extends block_base {
 
         if ($this->content !== null) {
             return $this->content;
+        }
+
+        // Prepare slides.
+        if ($slides = $DB->get_records('slider_slides', array('sliderid' => $this->instance->id), 'slide_order ASC')) {
+            $this->hasslides = $slides;
         }
 
         $this->content = new stdClass;
@@ -79,36 +87,16 @@ class block_slider extends block_base {
         $this->content->text .= '<div class="slider"><div id="slides' . $this->instance->id . $bxs . '" ';
 
         if (!$bxslider) {
-            $this->content->text .= 'style="display: none;"';
+            $this->content->text .= 'style="display: none;" class="slides' . $this->instance->id . $bxs . '"';
         } else {
             $this->content->text .= 'class="bxslider bxslider' . $this->instance->id . $bxs . '" style="visibility: hidden;"';
         }
         $this->content->text .= '>';
 
-        // Get and display images.
-        if ($slides = $DB->get_records('slider_slides', array('sliderid' => $this->instance->id), 'slide_order ASC')) {
-            foreach ($slides as $slide) {
-                if ($bxslider) {
-                    $this->content->text .= html_writer::start_tag('div');
-                }
-                $imageurl = $CFG->wwwroot . '/pluginfile.php/' . $this->context->id . '/block_slider/slider_slides/' . $slide->id .
-                        '/' . $slide->slide_image;
-                if (!empty($slide->slide_link)) {
-                    $this->content->text .= html_writer::start_tag('a', array('href' => $slide->slide_link, 'rel' => 'nofollow'));
-                }
-                $this->content->text .= html_writer::empty_tag('img',
-                        array('src' => $imageurl, 'class' => 'img', 'alt' => $slide->slide_image, 'title' => $slide->slide_title));
-                if (!empty($slide->slide_link)) {
-                    $this->content->text .= html_writer::end_tag('a');
-                }
-                if ($bxslider) {
-                    $this->content->text .= html_writer::end_tag('div');
-                }
-            }
-        }
+        $this->content->text .= $this->display_images($bxslider);
 
         // Navigation Left/Right.
-        if (!empty($this->config->navigation) && !$bxslider) {
+        if (!empty($this->config->navigation) && !$bxslider && $this->hasslides) {
             $this->content->text .= '<a href="#" class="slidesjs-previous slidesjs-navigation">
     <i class="icon fa fa-chevron-left icon-large" aria-hidden="true" aria-label="Prev"></i></a>';
             $this->content->text .= '<a href="#" class="slidesjs-next slidesjs-navigation">
@@ -158,7 +146,6 @@ class block_slider extends block_base {
         if ($bxslider) {
             $this->page->requires->js_call_amd('block_slider/bxslider', 'init',
                     bxslider_get_settings($this->config, $this->instance->id . $bxs));
-
         } else {
             $this->page->requires->js_call_amd('block_slider/slides', 'init',
                     array($width, $height, $effect, $interval, $autoplay, $pag, $nav, $this->instance->id . $bxs));
@@ -176,6 +163,63 @@ class block_slider extends block_base {
         }
 
         return $this->content;
+    }
+
+    /**
+     * Generate html with slides.
+     *
+     * @param bool $bxslider
+     * @return string
+     */
+    public function display_images($bxslider = false) {
+        global $CFG;
+        // Get and display images.
+        $html = '';
+        if ($this->hasslides) {
+            foreach ($this->hasslides as $slide) {
+                $imageurl = $CFG->wwwroot . '/pluginfile.php/' . $this->context->id . '/block_slider/slider_slides/' . $slide->id .
+                        '/' . $slide->slide_image;
+                if ($bxslider) {
+                    $html .= html_writer::start_tag('div', ['class' => 'bxslide']);
+                }
+                if (!empty($slide->slide_link)) {
+                    $html .= html_writer::start_tag('a', array('href' => $slide->slide_link, 'rel' => 'nofollow'));
+                }
+                $html .= html_writer::empty_tag('img',
+                        array('src' => $imageurl,
+                                'class' => 'img',
+                                'alt' => $slide->slide_image,
+                            // Title has been moved to html code.
+                                'width' => '100%'));
+                if (!empty($slide->slide_link)) {
+                    $html .= html_writer::end_tag('a');
+                }
+
+                // Display captions in BxSlider mode.
+                if ($bxslider) {
+                    if ($this->config->bx_captions or $this->config->bx_displaydesc) {
+                        $classes = '';
+                        if ($this->config->bx_captions) {
+                            $classes .= ' bxcaption';
+                        }
+                        if ($this->config->bx_displaydesc) {
+                            $classes .= ' bxdesc';
+                        }
+                        if ($this->config->bx_hideonhover) {
+                            $classes .= ' hideonhover';
+                        }
+                        $html .= html_writer::start_tag('div', array('class' => 'bx-caption' . $classes));
+                        $html .= html_writer::tag('span', $slide->slide_title);
+                        $html .= html_writer::tag('p', $slide->slide_desc);
+                        $html .= html_writer::end_tag('div');
+                    }
+
+                    $html .= html_writer::end_tag('div');
+                }
+            }
+        }
+
+        return $html;
     }
 
     /**
@@ -227,13 +271,12 @@ class block_slider extends block_base {
     }
 
     /**
-     * Hide header of this block.
+     * Hide header of this block when user is not editing.
      *
      * @return bool
      */
     public function hide_header() {
-        global $PAGE;
-        if ($PAGE->user_is_editing()) {
+        if ($this->page->user_is_editing()) {
             return false;
         } else {
             return true;

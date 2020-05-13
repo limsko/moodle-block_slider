@@ -19,6 +19,14 @@ I have tested plugin on clean install of Moodle 3.1 - 3.8
 
 ## Version history:
 
+### 0.4.0
+* when in responsive mode on BX Slider images have now 100% width
+* optimized css for responsive display
+* new feature - display image description
+* new feature - allow to hide captions until mouse hover over slider
+* fixed issue with no slider when using SlideJS
+* small fixes in code
+
 ### 0.3.3
 * minor fixes in privacy subsystem implementation
 

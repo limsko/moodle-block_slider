@@ -40,16 +40,12 @@ class manage_images extends table_sql {
      */
     public function __construct($uniqueid) {
         parent::__construct($uniqueid);
+
         // Define the list of columns to show.
         $columns = array('slide_order', 'slide_link', 'slide_title', 'slide_desc', 'slide_image', 'manage');
         $this->define_columns($columns);
 
         // Define the titles of columns to show in header.
-        $string['slide_url'] = 'Adres URL';
-        $string['slide_title'] = 'Tytuł slajdu';
-        $string['slide_desc'] = 'Opis slajdu';
-        $string['slide_order'] = 'Kolejność';
-        $string['slide_image'] = 'Grafika slajdu';
         $headers = array(
                 get_string('slide_order', 'block_slider'),
                 get_string('slide_url', 'block_slider'),

@@ -146,6 +146,13 @@ function block_slider_delete_image($sliderid, $slideid, $slideimage = null) {
     }
 }
 
+/**
+ * Get settings for BXSlider JS.
+ *
+ * @param $config
+ * @param $sliderid
+ * @return array
+ */
 function bxslider_get_settings($config, $sliderid) {
     $bxpause = isset($config->interval) ? $config->interval : 5000;
     $bxeffect = isset($config->bx_effect) ? $config->bx_effect : 'fade';
