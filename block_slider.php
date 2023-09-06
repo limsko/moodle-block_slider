@@ -282,4 +282,28 @@ class block_slider extends block_base {
             return true;
         }
     }
+
+    /**
+     * Copy any block-specific data when copying to a new block instance.
+     * @param int $fromid the id number of the block instance to copy from
+     * @return boolean
+     */
+    public function instance_copy($fromid) {
+        global $DB;
+        $fromcontext = context_block::instance($fromid);
+        $fs = get_file_storage();
+        // Do not use draft files hacks outside of forms.
+        if ($slides = $DB->get_records('slider_slides', array('sliderid' => $fromid), 'slide_order ASC')) {
+            foreach ($slides as $slide) {
+                $files = $fs->get_area_files($fromcontext->id, 'block_slider', 'slider_slides', $slide->id, 'id ASC', false);
+                foreach ($files as $file) {
+                    $slide->sliderid = $this->instance->id;
+                    $itemid = $DB->insert_record('slider_slides', $slide);
+                    $filerecord = ['contextid' => $this->context->id, 'itemid' => $itemid];
+                    $fs->create_file_from_storedfile($filerecord, $file);
+                }
+            }
+        }
+        return true;
+    }
 }
