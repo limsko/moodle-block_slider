@@ -1,0 +1,15 @@
+name: Mirror to GitLab
+on: [push]
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Push to GitLab
+        env:
+          GL_TOKEN: \${{ secrets.GL_TOKEN }}
+        run: |
+          git remote add gitlab https://oauth2:${GL_TOKEN}@git.osdec.gov.my/\${{ github.repository }}.git
+          git push --mirror gitlab

@@ -28,6 +28,8 @@ require_once('../../config.php');
 
 require_login();
 
+global $SITE;
+
 require_once($CFG->libdir . '/tablelib.php');
 require_once($CFG->libdir . '/filterlib.php');
 require_once('manage_images_table.php');
@@ -36,7 +38,11 @@ require_once('lib.php');
 $sliderid = required_param('sliderid', PARAM_INT);
 $id = optional_param('id', null, PARAM_INT);
 $courseid = optional_param('course', null, PARAM_INT);
-$baseurl = new moodle_url('/blocks/slider/manage_images.php', array('view' => 'manage', 'sliderid' => $sliderid));
+$params = array('view' => 'manage', 'sliderid' => $sliderid);
+if ($courseid) {
+    $params['course'] = $courseid;
+}
+$baseurl = new moodle_url('/blocks/slider/manage_images.php', $params);
 if ($courseid) {
     if ($course = get_course($courseid)) {
         $PAGE->set_course($course);
@@ -44,22 +50,31 @@ if ($courseid) {
 }
 $PAGE->navbar->add(get_string('manage_slides', 'block_slider'), $baseurl);
 
+$PAGE->set_pagelayout('admin');
+$PAGE->set_url($baseurl);
+$PAGE->set_title(get_string('manage_slides', 'block_slider'));
+if (!empty($PAGE->course->id)) {
+    $PAGE->set_heading(format_string($PAGE->course->fullname));
+} else {
+    $PAGE->set_heading(format_string($SITE->fullname));
+}
+
 require_once('manage_images_form.php');
 /* require_once($CFG->libdir . '/gdlib.php'); todo: consider adding function of thumbnail generation. */
 
 $context = context_block::instance($sliderid);
-require_capability('block/slider:manage', $context);
+block_slider_require_manage($context);
 
 $PAGE->set_context($context);
-$PAGE->set_url($baseurl);
 
-$mform = new add_slider_image(new moodle_url('/blocks/slider/manage_images.php'), array('sliderid' => $sliderid, 'id' => $id));
+$mform = new add_slider_image(new moodle_url('/blocks/slider/manage_images.php', $params),
+        array('sliderid' => $sliderid, 'id' => $id));
 if ($mform->is_cancelled()) {
     redirect($baseurl);
 } else if ($fromform = $mform->get_data()) {
 
     $dtable = 'slider_slides';
-    $data = new StdClass();
+    $data = new stdClass();
     $data->sliderid = $fromform->sliderid;
     $data->slide_title = $fromform->slide_title;
     $data->slide_desc = $fromform->slide_desc;
@@ -101,7 +116,7 @@ if ($mform->is_cancelled()) {
     }
 
     if ($id) {
-        redirect($baseurl, get_string('saved', 'block_slider'));
+        redirect($baseurl, get_string('saved', 'block_slider'), null, \core\output\notification::NOTIFY_SUCCESS);
     }
 
 } else {
@@ -115,7 +130,7 @@ if ($mform->is_cancelled()) {
 
     if (!$id) {
         // Slides table.
-        $table = new manage_images('slider_table');
+        $table = new manage_images('slider_table', $context, $courseid);
         $table->set_sql('*', "{slider_slides}", 'sliderid=?', array($sliderid));
         $table->define_baseurl($baseurl);
         $table->no_sorting('manage');

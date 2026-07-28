@@ -42,10 +42,11 @@ if (!defined('MOODLE_INTERNAL')) {
  * @throws require_login_exception
  * @throws required_capability_exception
  */
-function block_slider_pluginfile($course, $birecordorcm, $context, $filearea, $args, $forcedownload, array $options = array()) {
+function block_slider_pluginfile($course, $birecordorcm, $context, $filearea, $args, $forcedownload,
+        array $options = array()) {
     global $DB, $CFG;
 
-    if ($context->contextlevel != CONTEXT_BLOCK) {
+    if ($context->contextlevel !== CONTEXT_BLOCK) {
         send_file_not_found();
     }
 
@@ -53,7 +54,7 @@ function block_slider_pluginfile($course, $birecordorcm, $context, $filearea, $a
     if ($context->get_course_context(false)) {
         require_course_login($course);
     } else if ($CFG->forcelogin) {
-        require_login();
+        require_login(null, false, null, false, true);
     } else {
         // Get parent context and see if user have proper permission.
         $parentcontext = $context->get_parent_context();
@@ -77,11 +78,16 @@ function block_slider_pluginfile($course, $birecordorcm, $context, $filearea, $a
     $filename = array_pop($args);
     $filepath = $args ? '/' . implode('/', $args) . '/' : '/';
 
+    if ($itemid === null || $filename === null) {
+        send_file_not_found();
+    }
+
     if (!$file = $fs->get_file($context->id, 'block_slider', $filearea, $itemid, $filepath, $filename) or $file->is_directory()) {
         send_file_not_found();
     }
 
-    if ($parentcontext = context::instance_by_id($birecordorcm->parentcontextid, IGNORE_MISSING)) {
+    if (!empty($birecordorcm->parentcontextid) &&
+            ($parentcontext = \context::instance_by_id($birecordorcm->parentcontextid, IGNORE_MISSING))) {
         if ($parentcontext->contextlevel == CONTEXT_USER) {
             // Force download on all personal pages including /my/.
             // Because we do not have reliable way to find out from where this is used.
@@ -137,7 +143,10 @@ function block_slider_delete_slide($slide) {
 function block_slider_delete_image($sliderid, $slideid, $slideimage = null) {
     global $DB;
     $fs = get_file_storage();
-    $context = context_block::instance($sliderid);
+    $context = context_block::instance($sliderid, IGNORE_MISSING);
+    if (!$context) {
+        return;
+    }
     if (!$slideimage) {
         $slideimage = $DB->get_field('slider_slides', 'slide_image', array('sliderid' => $sliderid, 'id' => $slideid));
     }
@@ -154,16 +163,61 @@ function block_slider_delete_image($sliderid, $slideid, $slideimage = null) {
  * @return array
  */
 function bxslider_get_settings($config, $sliderid) {
-    $bxpause = isset($config->interval) ? $config->interval : 5000;
+    $bxpause = isset($config->interval) ? (int) $config->interval : 5000;
     $bxeffect = isset($config->bx_effect) ? $config->bx_effect : 'fade';
-    $bxspeed = isset($config->bx_speed) ? $config->bx_speed : 500;
-    $bxcaptions = isset($config->bx_captions) ? $config->bx_captions : 0;
-    $bxresponsive = isset($config->bx_responsive) ? $config->bx_responsive : 1;
-    $bxpager = isset($config->bx_pager) ? $config->bx_pager : 1;
-    $bxcontrols = isset($config->bx_controls) ? $config->bx_controls : 1;
-    $bxauto = isset($config->bx_auto) ? $config->bx_auto : 1;
-    $bxstopautoonclick = isset($config->bx_stopAutoOnClick) ? $config->bx_stopAutoOnClick : 0;
-    $bxusecss = isset($config->bx_useCSS) ? $config->bx_useCSS : 0;
-    return array($sliderid, $bxpause, $bxeffect, $bxspeed, boolval($bxcaptions), boolval($bxresponsive), boolval($bxpager),
-            boolval($bxcontrols), boolval($bxauto), boolval($bxstopautoonclick), boolval($bxusecss));
+    $bxspeed = isset($config->bx_speed) ? (int) $config->bx_speed : 500;
+    $bxcaptions = !empty($config->bx_captions);
+    $bxresponsive = !empty($config->bx_responsive);
+    $bxpager = !empty($config->bx_pager);
+    $bxcontrols = !empty($config->bx_controls);
+    $bxauto = !empty($config->bx_auto);
+    $bxstopautoonclick = !empty($config->bx_stopAutoOnClick);
+    $bxusecss = !empty($config->bx_useCSS);
+    return array($sliderid, $bxpause, $bxeffect, $bxspeed, $bxcaptions, $bxresponsive, $bxpager,
+            $bxcontrols, $bxauto, $bxstopautoonclick, $bxusecss);
+}
+
+/**
+ * Determine if the current user can manage the slider in the supplied context.
+ *
+ * Editing teachers (or other roles with the capability) can manage course sliders.
+ * Sliders outside course contexts require site administrators.
+ *
+ * @param context_block $context
+ * @return bool
+ */
+function block_slider_user_can_manage(context_block $context): bool {
+    if ($context->get_course_context(false)) {
+        return has_capability('block/slider:manage', $context);
+    }
+
+    $systemcontext = context_system::instance();
+
+    $parent = $context->get_parent_context();
+    if ($parent && $parent->contextlevel === CONTEXT_USER) {
+        return has_capability('moodle/site:config', $systemcontext);
+    }
+
+    // Blocks placed on the site, dashboard, or other contexts fall back to site admins only.
+    return has_capability('moodle/site:config', $systemcontext);
+}
+
+/**
+ * Require that the current user can manage the slider in the supplied context.
+ *
+ * @param context_block $context
+ */
+function block_slider_require_manage(context_block $context): void {
+    if ($context->get_course_context(false)) {
+        require_capability('block/slider:manage', $context);
+        return;
+    }
+
+    $parent = $context->get_parent_context();
+    if ($parent && $parent->contextlevel === CONTEXT_USER) {
+        require_capability('moodle/site:config', context_system::instance());
+        return;
+    }
+
+    require_capability('moodle/site:config', context_system::instance());
 }

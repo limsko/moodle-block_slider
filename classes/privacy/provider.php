@@ -116,7 +116,7 @@ class provider implements
         $sql = "SELECT bpc.instanceid AS userid
                   FROM {block_instances} bi
                   JOIN {context} bpc ON bpc.id = bi.parentcontextid
-                 WHERE bi.blockname = 'html'
+                 WHERE bi.blockname = 'slider'
                    AND bpc.contextlevel = :contextuser
                    AND bi.id = :blockinstanceid";
 
@@ -161,7 +161,7 @@ class provider implements
             $context = \context_block::instance($instance->id);
             $block = block_instance('slider', $instance);
             if (!$slides = $DB->get_records('slider_slides', array('sliderid' => $instance->id), 'slide_order ASC')) {
-                return;
+                continue;
             } else {
                 $html = '';
                 foreach ($slides as $slide) {
@@ -197,7 +197,7 @@ class provider implements
             return;
         }
 
-        // The only way to delete data for the html block is to delete the block instance itself.
+        // The only way to delete data for the slider block is to delete the block instance itself.
         if ($blockinstance = static::get_instance_from_context($context)) {
             blocks_delete_instance($blockinstance);
         }
@@ -222,7 +222,7 @@ class provider implements
      * @param approved_contextlist $contextlist The approved contexts and user information to delete information for.
      */
     public static function delete_data_for_user(approved_contextlist $contextlist) {
-        // The only way to delete data for the html block is to delete the block instance itself.
+        // The only way to delete data for the slider block is to delete the block instance itself.
         foreach ($contextlist as $context) {
 
             if (!$context instanceof \context_block) {

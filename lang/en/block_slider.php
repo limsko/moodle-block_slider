@@ -56,6 +56,7 @@ $string['slide_image'] = 'Slide Image';
 $string['slider_id_for_filter'] = '<i class="fa fa-icon fa-info-circle"></i> Use <code>[SLIDER-{$a}]</code> if You want to display this Slider with Filter Slider.';
 $string['saved'] = 'Slide saved';
 $string['slider_js'] = 'Slider JS library';
+$string['errorinvalidslide'] = 'The requested slide does not exist.';
 $string['confirm_deletion'] = 'Do You really want to delete this slide?';
 $string['deleted'] = 'Slide has been deleted';
 $string['new_slide_image'] = 'Upload new Slide Image';

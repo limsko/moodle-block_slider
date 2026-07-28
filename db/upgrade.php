@@ -73,7 +73,7 @@ function xmldb_block_slider_upgrade($oldversion) {
                     $filename = $file->get_filename();
                     if ($filename <> '.') {
                         $dtable = 'slider_slides';
-                        $data = new StdClass();
+                        $data = new stdClass();
                         $data->sliderid = $instance->id;
                         $data->slide_image = $filename;
                         $data->slide_order = 0;
@@ -102,6 +102,11 @@ function xmldb_block_slider_upgrade($oldversion) {
 
     if ($oldversion < 2020011800) {
         upgrade_plugin_savepoint(true, 2020011800, 'block', 'slider');
+    }
+
+    if ($oldversion < 2024051200) {
+        // Version bump for Moodle 4.5 compatibility release.
+        upgrade_plugin_savepoint(true, 2024051200, 'block', 'slider');
     }
 
     return true;

@@ -15,9 +15,15 @@ Install using Moodle backend panel as described on http://docs.moodle.org/en/Ins
 Download, extract, and upload the "slider" folder into moodle/blocks/
 
 ## Supported Moodle versions:
-I have tested plugin on clean install of Moodle 3.1 - 3.8
+Tested with Moodle 4.5 (build 2024042200)
 
 ## Version history:
+
+### 1.0.0
+* Updated for Moodle 4.5 and PHP 8.1 compatibility
+* Hardened file delivery, deletion workflows, and URL handling
+* Improved slider rendering and accessibility with cleaner markup
+* Modernised forms and admin UI feedback
 
 ### 0.4.0
 * when in responsive mode on BX Slider images have now 100% width
@@ -87,7 +93,6 @@ https://github.com/stevenwanderski/bxslider-4
 
 ### 0.1.0
 * First release
-
 
 
 

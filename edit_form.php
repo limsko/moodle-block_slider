@@ -47,21 +47,21 @@ class block_slider_edit_form extends block_edit_form {
         $mform->setType('config_text', PARAM_RAW);
         // Slider width.
         $mform->addElement('text', 'config_width', get_string('config_width', 'block_slider'));
-        $mform->setDefault('config_width', '940');
-        $mform->setType('config_width', PARAM_RAW);
+        $mform->setDefault('config_width', 940);
+        $mform->setType('config_width', PARAM_INT);
         $mform->addHelpButton('config_width', 'config_width', 'block_slider');
         // Slider height.
         $mform->addElement('text', 'config_height', get_string('config_height', 'block_slider'));
-        $mform->setDefault('config_height', '528');
-        $mform->setType('config_height', PARAM_RAW);
+        $mform->setDefault('config_height', 528);
+        $mform->setType('config_height', PARAM_INT);
         $mform->addHelpButton('config_height', 'config_height', 'block_slider');
 
         $mform->addElement('select', 'config_slider_js', get_string('slider_js', 'block_slider'),
                 array('bxslider' => 'BX Slider', 'slides' => 'SlideJS'), null);
 
         $mform->addElement('text', 'config_interval', get_string('int', 'block_slider'));
-        $mform->setDefault('config_interval', '5000'); // In BX called pause.
-        $mform->setType('config_interval', PARAM_RAW);
+        $mform->setDefault('config_interval', 5000); // In BX called pause.
+        $mform->setType('config_interval', PARAM_INT);
 
         // SlideJS settings.
         $mform->addElement('header', 'bs_h1', get_string('slidesjs_h1', 'block_slider'));
@@ -106,7 +106,7 @@ class block_slider_edit_form extends block_edit_form {
 
         $mform->addElement('select', 'config_bx_responsive', get_string('config_bx_responsive', 'block_slider'),
                 array(1 => get_string('yes'), 0 => get_string('no')), null);
-        $mform->setDefault('config_bx_captions', 1);
+        $mform->setDefault('config_bx_responsive', 1);
         $mform->addHelpButton('config_bx_responsive', 'config_bx_responsive', 'block_slider');
 
         $mform->addElement('select', 'config_bx_pager', get_string('config_bx_pager', 'block_slider'),
@@ -134,18 +134,5 @@ class block_slider_edit_form extends block_edit_form {
         $mform->setDefault('config_bx_useCSS', 0);
         $mform->addHelpButton('config_bx_useCSS', 'config_bx_useCSS', 'block_slider');
 
-    }
-
-    /**
-     * Sets data for form.
-     *
-     * @param array|stdClass $defaults
-     */
-    public function set_data($defaults) {
-        if (!isset($entry) && empty($entry->id)) {
-            $entry = new stdClass;
-            $entry->id = null;
-        }
-        parent::set_data($defaults);
     }
 }

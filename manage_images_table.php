@@ -33,12 +33,22 @@ if (!defined('MOODLE_INTERNAL')) {
  */
 class manage_images extends table_sql {
 
+    /** @var \context_block Block context for file URLs. */
+    protected $blockcontext;
+
+    /** @var int|null Course id for routing. */
+    protected $courseid;
+
     /**
      * manage_images constructor.
-     * @param $uniqueid
+     * @param string $uniqueid
+     * @param \context_block $context
+     * @param int|null $courseid
      * @throws coding_exception
      */
-    public function __construct($uniqueid) {
+    public function __construct($uniqueid, \context_block $context, ?int $courseid = null) {
+        $this->blockcontext = $context;
+        $this->courseid = $courseid;
         parent::__construct($uniqueid);
 
         // Define the list of columns to show.
@@ -64,11 +74,18 @@ class manage_images extends table_sql {
      * @return string
      */
     public function col_slide_image($values) {
-        global $CFG, $context;
-        // If the data is being downloaded than we don't want to show HTML.
-        $url = $CFG->wwwroot . '/pluginfile.php/' . $context->id . '/block_slider/slider_slides/' . $values->id . '/' .
-                $values->slide_image;
-        return html_writer::empty_tag('img', array('src' => $url, 'class' => 'img-thumbnail'));
+        $url = moodle_url::make_pluginfile_url(
+            $this->blockcontext->id,
+            'block_slider',
+            'slider_slides',
+            $values->id,
+            '/',
+            $values->slide_image
+        )->out(false);
+        $alt = !empty($values->slide_title)
+            ? format_string($values->slide_title, true, ['context' => $this->blockcontext])
+            : s($values->slide_image);
+        return html_writer::empty_tag('img', array('src' => $url, 'class' => 'img-thumbnail', 'alt' => $alt));
     }
 
     /**
@@ -80,11 +97,18 @@ class manage_images extends table_sql {
      * @throws moodle_exception
      */
     public function col_manage($values) {
-        $editurl = new moodle_url('/blocks/slider/manage_images.php', array('id' => $values->id, 'sliderid' => $values->sliderid));
-        $editbtn = html_writer::tag('a', get_string('edit'), array('href' => $editurl, 'class' => 'btn btn-primary'));
-        $deleteurl =
-                new moodle_url('/blocks/slider/delete_image.php', array('id' => $values->id, 'sliderid' => $values->sliderid));
-        $deletebtn = html_writer::tag('a', get_string('delete'), array('href' => $deleteurl, 'class' => 'btn btn-primary'));
+        $editparams = array('id' => $values->id, 'sliderid' => $values->sliderid);
+        if ($this->courseid) {
+            $editparams['course'] = $this->courseid;
+        }
+        $editurl = new moodle_url('/blocks/slider/manage_images.php', $editparams);
+        $editbtn = html_writer::link($editurl, get_string('edit'), array('class' => 'btn btn-primary mb-1'));
+        $deleteparams = array('id' => $values->id, 'sliderid' => $values->sliderid, 'sesskey' => sesskey());
+        if ($this->courseid) {
+            $deleteparams['course'] = $this->courseid;
+        }
+        $deleteurl = new moodle_url('/blocks/slider/delete_image.php', $deleteparams);
+        $deletebtn = html_writer::link($deleteurl, get_string('delete'), array('class' => 'btn btn-danger'));
         return "<p>$editbtn</p><p>$deletebtn</p>";
     }
 }

@@ -54,7 +54,7 @@ class block_slider extends block_base {
      * @throws moodle_exception
      */
     public function get_content() {
-        global $CFG, $DB, $bxs;
+        global $CFG, $DB;
         require_once($CFG->libdir . '/filelib.php');
         require_once($CFG->dirroot . '/blocks/slider/lib.php');
 
@@ -62,104 +62,84 @@ class block_slider extends block_base {
             return $this->content;
         }
 
-        // Prepare slides.
-        if ($slides = $DB->get_records('slider_slides', array('sliderid' => $this->instance->id), 'slide_order ASC')) {
-            $this->hasslides = $slides;
+        $this->content = new stdClass();
+        $this->content->text = '';
+        $this->content->footer = '';
+
+        $this->hasslides = $DB->get_records('slider_slides', ['sliderid' => $this->instance->id], 'slide_order ASC') ?: [];
+
+        $config = $this->config ?? new stdClass();
+
+        $bxslider = isset($config->slider_js) && trim($config->slider_js) === 'bxslider';
+
+        if (!empty($config->text)) {
+            $this->content->text .= format_text($config->text, FORMAT_HTML, ['context' => $this->context, 'filter' => true]);
         }
 
-        $this->content = new stdClass;
-        $bxslider = false;
-        if (isset($this->config->slider_js) && trim($this->config->slider_js) === 'bxslider') {
-            $bxslider = true;
+        $imageshtml = $this->display_images($bxslider);
+        if ($imageshtml !== '') {
+            static $rendercounter = 0;
+            $rendercounter++;
+            $uniqueid = $this->instance->id . $rendercounter;
+            $sliderdomid = 'slides' . $uniqueid;
+
+            $sliderattrs = ['id' => $sliderdomid];
+            if ($bxslider) {
+                $sliderattrs['class'] = 'bxslider bxslider' . $uniqueid;
+                $sliderattrs['style'] = 'visibility: hidden;';
+            } else {
+                $sliderattrs['class'] = 'slides' . $uniqueid;
+                $sliderattrs['style'] = 'display: none;';
+            }
+
+            $sliderinner = html_writer::tag('div', $imageshtml, $sliderattrs);
+
+            if (!empty($config->navigation) && !$bxslider && !empty($this->hasslides)) {
+                $previcon = html_writer::tag('span', '', ['class' => 'icon fa fa-chevron-left', 'aria-hidden' => 'true']);
+                $nexticon = html_writer::tag('span', '', ['class' => 'icon fa fa-chevron-right', 'aria-hidden' => 'true']);
+                $prev = html_writer::link('#', $previcon . html_writer::span(get_string('previous', 'moodle'), 'sr-only'), [
+                    'class' => 'slidesjs-previous slidesjs-navigation',
+                    'role' => 'button',
+                    'aria-label' => get_string('previous', 'moodle'),
+                    'tabindex' => '0',
+                ]);
+                $next = html_writer::link('#', $nexticon . html_writer::span(get_string('next', 'moodle'), 'sr-only'), [
+                    'class' => 'slidesjs-next slidesjs-navigation',
+                    'role' => 'button',
+                    'aria-label' => get_string('next', 'moodle'),
+                    'tabindex' => '0',
+                ]);
+                $sliderinner .= $prev . $next;
+            }
+
+            $this->content->text .= html_writer::div($sliderinner, 'slider');
+
+            $width = (!empty($config->width) && is_numeric($config->width)) ? (int) $config->width : 940;
+            $height = (!empty($config->height) && is_numeric($config->height)) ? (int) $config->height : 528;
+            $interval = (!empty($config->interval) && is_numeric($config->interval)) ? (int) $config->interval : 5000;
+            $effect = !empty($config->effect) ? $config->effect : 'fade';
+            $pag = !empty($config->pagination);
+            $autoplay = !empty($config->autoplay);
+            $nav = !empty($config->navigation) && !$bxslider;
+
+            if ($bxslider) {
+                $this->page->requires->js_call_amd('block_slider/bxslider', 'init',
+                        bxslider_get_settings($config, $uniqueid));
+            } else {
+                $this->page->requires->js_call_amd('block_slider/slides', 'init',
+                        [$width, $height, $effect, $interval, $autoplay, $pag, $nav, $uniqueid]);
+            }
+        } else if (has_capability('block/slider:manage', $this->context)) {
+            $this->content->text .= html_writer::div(get_string('noimages', 'block_slider'), 'alert alert-info');
         }
 
-        if (!empty($this->config->text)) {
-            $this->content->text = $this->config->text;
-        } else {
-            $this->content->text = '';
-        }
-
-        if (!isset($bxs)) {
-            $bxs = 1;
-        } else {
-            $bxs++;
-        }
-        $this->content->text .= '<div class="slider"><div id="slides' . $this->instance->id . $bxs . '" ';
-
-        if (!$bxslider) {
-            $this->content->text .= 'style="display: none;" class="slides' . $this->instance->id . $bxs . '"';
-        } else {
-            $this->content->text .= 'class="bxslider bxslider' . $this->instance->id . $bxs . '" style="visibility: hidden;"';
-        }
-        $this->content->text .= '>';
-
-        $this->content->text .= $this->display_images($bxslider);
-
-        // Navigation Left/Right.
-        if (!empty($this->config->navigation) && !$bxslider && $this->hasslides) {
-            $this->content->text .= '<a href="#" class="slidesjs-previous slidesjs-navigation">
-    <i class="icon fa fa-chevron-left icon-large" aria-hidden="true" aria-label="Prev"></i></a>';
-            $this->content->text .= '<a href="#" class="slidesjs-next slidesjs-navigation">
-    <i class="icon fa fa-chevron-right icon-large" aria-hidden="true" aria-label="Next"></i></a>';
-        }
-
-        $this->content->text .= '</div></div>';
-
-        if (!empty($this->config->width) and is_numeric($this->config->width)) {
-            $width = $this->config->width;
-        } else {
-            $width = 940;
-        }
-
-        if (!empty($this->config->height) and is_numeric($this->config->height)) {
-            $height = $this->config->height;
-        } else {
-            $height = 528;
-        }
-
-        if (!empty($this->config->interval) and is_numeric($this->config->interval)) {
-            $interval = $this->config->interval;
-        } else {
-            $interval = 5000;
-        }
-
-        if (!empty($this->config->effect)) {
-            $effect = $this->config->effect;
-        } else {
-            $effect = 'fade';
-        }
-
-        if (!empty($this->config->pagination)) {
-            $pag = true;
-        } else {
-            $pag = false;
-        }
-
-        if (!empty($this->config->autoplay)) {
-            $autoplay = true;
-        } else {
-            $autoplay = false;
-        }
-
-        $nav = false;
-
-        if ($bxslider) {
-            $this->page->requires->js_call_amd('block_slider/bxslider', 'init',
-                    bxslider_get_settings($this->config, $this->instance->id . $bxs));
-        } else {
-            $this->page->requires->js_call_amd('block_slider/slides', 'init',
-                    array($width, $height, $effect, $interval, $autoplay, $pag, $nav, $this->instance->id . $bxs));
-        }
-        // If user has capability of editing, add button.
-        if (has_capability('block/slider:manage', $this->context)) {
-            $instancearray = array('sliderid' => $this->instance->id);
-            if (isset($this->page->course->id)) {
+        if (block_slider_user_can_manage($this->context)) {
+            $instancearray = ['sliderid' => $this->instance->id];
+            if (!empty($this->page->course->id)) {
                 $instancearray['course'] = $this->page->course->id;
             }
             $editurl = new moodle_url('/blocks/slider/manage_images.php', $instancearray);
-            $this->content->footer = html_writer::tag('a', get_string('manage_slides', 'block_slider'),
-                    array('href' => $editurl, 'class' => 'btn btn-primary'));
-
+            $this->content->footer = html_writer::link($editurl, get_string('manage_slides', 'block_slider'), ['class' => 'btn btn-primary']);
         }
 
         return $this->content;
@@ -172,50 +152,74 @@ class block_slider extends block_base {
      * @return string
      */
     public function display_images($bxslider = false) {
-        global $CFG;
-        // Get and display images.
+        if (empty($this->hasslides)) {
+            return '';
+        }
+
+        $config = $this->config ?? new stdClass();
+
         $html = '';
-        if ($this->hasslides) {
-            foreach ($this->hasslides as $slide) {
-                $imageurl = $CFG->wwwroot . '/pluginfile.php/' . $this->context->id . '/block_slider/slider_slides/' . $slide->id .
-                        '/' . $slide->slide_image;
-                if ($bxslider) {
-                    $html .= html_writer::start_tag('div', ['class' => 'bxslide']);
-                }
-                if (!empty($slide->slide_link)) {
-                    $html .= html_writer::start_tag('a', array('href' => $slide->slide_link, 'rel' => 'nofollow'));
-                }
-                $html .= html_writer::empty_tag('img',
-                        array('src' => $imageurl,
-                                'class' => 'img',
-                                'alt' => $slide->slide_image,
-                            // Title has been moved to html code.
-                                'width' => '100%'));
-                if (!empty($slide->slide_link)) {
-                    $html .= html_writer::end_tag('a');
-                }
+        foreach ($this->hasslides as $slide) {
+            $imageurl = moodle_url::make_pluginfile_url(
+                $this->context->id,
+                'block_slider',
+                'slider_slides',
+                $slide->id,
+                '/',
+                $slide->slide_image
+            )->out(false);
 
-                // Display captions in BxSlider mode.
-                if ($bxslider) {
-                    if ($this->config->bx_captions or $this->config->bx_displaydesc) {
-                        $classes = '';
-                        if ($this->config->bx_captions) {
-                            $classes .= ' bxcaption';
-                        }
-                        if ($this->config->bx_displaydesc) {
-                            $classes .= ' bxdesc';
-                        }
-                        if ($this->config->bx_hideonhover) {
-                            $classes .= ' hideonhover';
-                        }
-                        $html .= html_writer::start_tag('div', array('class' => 'bx-caption' . $classes));
-                        $html .= html_writer::tag('span', $slide->slide_title);
-                        $html .= html_writer::tag('p', $slide->slide_desc);
-                        $html .= html_writer::end_tag('div');
+            if ($bxslider) {
+                $html .= html_writer::start_tag('div', ['class' => 'bxslide']);
+            }
+
+            $link = '';
+            if (!empty($slide->slide_link)) {
+                $cleanlink = clean_param($slide->slide_link, PARAM_URL);
+                if (!empty($cleanlink)) {
+                    $link = $cleanlink;
+                    $html .= html_writer::start_tag('a', ['href' => $link, 'rel' => 'nofollow']);
+                }
+            }
+
+            $alttext = !empty($slide->slide_title) ? format_string($slide->slide_title, true, ['context' => $this->context]) : s($slide->slide_image);
+            $html .= html_writer::empty_tag('img', [
+                'src' => $imageurl,
+                'class' => 'img',
+                'alt' => $alttext,
+                'width' => '100%'
+            ]);
+
+            if ($link) {
+                $html .= html_writer::end_tag('a');
+            }
+
+            if ($bxslider) {
+                $showcaptions = !empty($config->bx_captions) || !empty($config->bx_displaydesc);
+                if ($showcaptions) {
+                    $classes = '';
+                    if (!empty($config->bx_captions)) {
+                        $classes .= ' bxcaption';
                     }
-
+                    if (!empty($config->bx_displaydesc)) {
+                        $classes .= ' bxdesc';
+                    }
+                    if (!empty($config->bx_hideonhover)) {
+                        $classes .= ' hideonhover';
+                    }
+                    $html .= html_writer::start_tag('div', ['class' => 'bx-caption' . $classes]);
+                    $titletext = trim((string) ($slide->slide_title ?? ''));
+                    $desctext = trim((string) ($slide->slide_desc ?? ''));
+                    if ($titletext !== '') {
+                        $html .= html_writer::tag('span', format_string($titletext, true, ['context' => $this->context]));
+                    }
+                    if ($desctext !== '') {
+                        $html .= html_writer::tag('p', format_string($desctext, true, ['context' => $this->context]));
+                    }
                     $html .= html_writer::end_tag('div');
                 }
+
+                $html .= html_writer::end_tag('div');
             }
         }
 
