@@ -1,0 +1,138 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template block_slider/manage
+
+    Panel zarządzania slajdami: pasek akcji i lista slajdów z przeciąganiem.
+
+    Context variables required for this template:
+    * blockid - instancja bloku
+    * addurl - adres formularza nowego slajdu
+    * returnurl - powrót na stronę z blokiem
+    * slides - lista slajdów
+    * hasslides, sortable - stan listy
+    * filtercode - kod filtra slajdera (gdy filtr jest włączony)
+
+    Example context (json):
+    {
+        "blockid": 5,
+        "addurl": "#",
+        "returnurl": "#",
+        "hasslides": true,
+        "sortable": true,
+        "filtercode": "[SLIDER-5]",
+        "slides": [
+            {
+                "id": 1,
+                "position": 1,
+                "title": "Welcome",
+                "untitled": false,
+                "movetitle": "Move Welcome",
+                "subtitle": "Subtitle",
+                "description": "Short description",
+                "thumburl": "https://picsum.photos/250/140",
+                "mobilethumburl": "",
+                "link": "https://moodle.org/course/view.php?id=2",
+                "linkshort": "moodle.org/course/view.php?...",
+                "newwindow": true,
+                "buttonlabel": "Button: Read more",
+                "visible": true,
+                "editurl": "#",
+                "deleteurl": "#",
+                "moveupurl": "#",
+                "movedownurl": "#",
+                "toggleurl": "#"
+            }
+        ]
+    }
+}}
+<div class="block-slider-manage" data-region="block-slider-manage" data-blockid="{{blockid}}">
+    <div class="block-slider-manage-toolbar">
+        <a href="{{addurl}}" class="btn btn-primary">{{#str}} addslide, block_slider {{/str}}</a>
+        {{#returnurl}}
+        <a href="{{returnurl}}" class="btn btn-secondary">{{#str}} backtopage, block_slider {{/str}}</a>
+        {{/returnurl}}
+        {{#sortable}}
+        <span class="block-slider-manage-hint">{{#str}} reorderhint, block_slider {{/str}}</span>
+        {{/sortable}}
+    </div>
+
+    {{#filtercode}}
+    <div class="block-slider-manage-filter">
+        {{#str}} filtercode, block_slider {{/str}}
+        <code id="block-slider-filtercode-{{blockid}}">{{filtercode}}</code>
+        <button type="button" class="btn btn-link btn-sm p-0" data-action="copytoclipboard" data-clipboard-target="#block-slider-filtercode-{{blockid}}">
+            {{#pix}} t/copy, core, {{#str}} copytoclipboard, core {{/str}} {{/pix}}
+        </button>
+    </div>
+    {{/filtercode}}
+
+    {{^hasslides}}
+    <div class="alert alert-info">{{#str}} noslides, block_slider {{/str}}</div>
+    {{/hasslides}}
+
+    {{#hasslides}}
+    <ul class="block-slider-manage-list" data-region="slides">
+        {{#slides}}
+        <li class="block-slider-manage-item{{^visible}} is-hidden{{/visible}}" data-slideid="{{id}}">
+            <div class="block-slider-manage-order">
+                {{#sortable}}{{> core/drag_handle}}{{/sortable}}
+                <span class="block-slider-manage-position" data-region="position">{{position}}</span>
+            </div>
+            <div class="block-slider-manage-preview">
+                {{#thumburl}}<img class="block-slider-manage-thumb" src="{{thumburl}}" alt="" loading="lazy" data-region="thumb">{{/thumburl}}
+                <span class="block-slider-manage-noimage" data-region="noimage" title="{{#str}} noimage, block_slider {{/str}}"{{#thumburl}} hidden{{/thumburl}}>
+                    {{#pix}} i/messagecontentimage, core, {{#str}} noimage, block_slider {{/str}} {{/pix}}
+                </span>
+                {{#mobilethumburl}}<img class="block-slider-manage-thumb-mobile" src="{{mobilethumburl}}" alt="{{#str}} mobileimage, block_slider {{/str}}" title="{{#str}} mobileimage, block_slider {{/str}}" loading="lazy" data-region="mobilethumb">{{/mobilethumburl}}
+            </div>
+            <div class="block-slider-manage-content">
+                <div class="block-slider-manage-title">
+                    {{#untitled}}<span class="block-slider-manage-muted">{{#str}} notitle, block_slider {{/str}}</span>{{/untitled}}
+                    {{^untitled}}<span data-region="title">{{{title}}}</span>{{/untitled}}
+                    {{^visible}}<span class="badge badge-secondary">{{#str}} hiddenfromstudents {{/str}}</span>{{/visible}}
+                </div>
+                {{#subtitle}}<div class="block-slider-manage-muted">{{{subtitle}}}</div>{{/subtitle}}
+                {{#description}}<div class="block-slider-manage-muted small">{{{description}}}</div>{{/description}}
+                {{#link}}
+                <div class="block-slider-manage-link">
+                    <span class="block-slider-manage-linktext" title="{{link}}">{{linkshort}}</span>
+                    <span class="sr-only" id="block-slider-link-{{id}}">{{link}}</span>
+                    <button type="button" class="btn btn-link btn-sm p-0" data-action="copytoclipboard" data-clipboard-target="#block-slider-link-{{id}}" data-clipboard-success-message="{{#str}} linkcopied, block_slider {{/str}}">
+                        {{#pix}} t/copy, core, {{#str}} copylink, block_slider {{/str}} {{/pix}}
+                    </button>
+                    <a href="{{link}}" target="_blank" rel="noopener" title="{{#str}} openlink, block_slider {{/str}}">
+                        {{#pix}} i/externallink, core, {{#str}} openlink, block_slider {{/str}} {{/pix}}
+                    </a>
+                    {{#newwindow}}<span class="badge badge-light">{{#str}} newwindow, block_slider {{/str}}</span>{{/newwindow}}
+                    {{#buttonlabel}}<span class="badge badge-light">{{{buttonlabel}}}</span>{{/buttonlabel}}
+                </div>
+                {{/link}}
+            </div>
+            <div class="block-slider-manage-actions">
+                <a href="{{moveupurl}}" class="block-slider-manage-moveup" data-action="moveup">{{#pix}} t/up, core, {{#str}} moveup {{/str}} {{/pix}}</a>
+                <a href="{{movedownurl}}" class="block-slider-manage-movedown" data-action="movedown">{{#pix}} t/down, core, {{#str}} movedown {{/str}} {{/pix}}</a>
+                {{#visible}}<a href="{{toggleurl}}" data-action="hide">{{#pix}} t/hide, core, {{#str}} hide {{/str}} {{/pix}}</a>{{/visible}}
+                {{^visible}}<a href="{{toggleurl}}" data-action="show">{{#pix}} t/show, core, {{#str}} show {{/str}} {{/pix}}</a>{{/visible}}
+                <a href="{{editurl}}" data-action="edit">{{#pix}} t/edit, core, {{#str}} edit {{/str}} {{/pix}}</a>
+                <a href="{{deleteurl}}" data-action="delete">{{#pix}} t/delete, core, {{#str}} delete {{/str}} {{/pix}}</a>
+            </div>
+        </li>
+        {{/slides}}
+    </ul>
+    {{/hasslides}}
+</div>
