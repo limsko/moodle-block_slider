@@ -28,6 +28,9 @@ image for narrow screens), title, subtitle, description, link and an optional bu
 | `MOODLE_405_STABLE` | 4.2 - 4.5 |
 | `MOODLE_503_STABLE` | 5.0 - 5.3 |
 
+Version numbers (`YYYYMMDDXX`) end with 00-49 on `MOODLE_405_STABLE` and 50-99 on `MOODLE_503_STABLE`,
+so for the same date the 5.x build is always newer. Release fixes on both branches together.
+
 ## Installation
 
 Install from the Moodle plugins directory or copy the code to `blocks/slider`
