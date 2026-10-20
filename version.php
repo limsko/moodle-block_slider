@@ -15,19 +15,19 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Simple slider block for Moodle
+ * Informacje o wersji bloku slajdera.
  *
- * @package   block_slider
- * @copyright 2015-2020 Kamil Łuczak    www.limsko.pl     kamil@limsko.pl
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package     block_slider
+ * @author      Kamil Łuczak <kamil@limsko.pl>
+ * @copyright   (C) 2015-2026 Kamil Łuczak (https://limsko.pl)
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-if (!defined('MOODLE_INTERNAL')) {
-    die('Direct access to this script is forbidden.'); // It must be included from a Moodle page.
-}
+defined('MOODLE_INTERNAL') || die();
 
-$plugin->version = 2020051300;
-$plugin->requires = 2016052312;
-$plugin->maturity = MATURITY_BETA;
-$plugin->release = "0.4.0";
 $plugin->component = 'block_slider';
+$plugin->version = 2026102000;
+$plugin->requires = 2023042400;
+$plugin->supported = [402, 405];
+$plugin->maturity = MATURITY_STABLE;
+$plugin->release = '1.0.0';
