@@ -37,6 +37,7 @@ require_once($CFG->dirroot . '/blocks/slider/db/upgradelib.php');
  * @covers      ::block_slider_convert_legacy_config
  * @covers      ::block_slider_legacy_ratio
  * @covers      ::block_slider_legacy_speed
+ * @covers      ::block_slider_legacy_link
  */
 final class upgradelib_test extends \advanced_testcase {
     /**
@@ -101,7 +102,8 @@ final class upgradelib_test extends \advanced_testcase {
         $generator = $this->getDataGenerator()->get_plugin_generator('block_slider');
         $block = $generator->create_instance();
         $context = \context_block::instance($block->id);
-        $this->create_legacy_slide($block, ['slide_title' => 'Second', 'slide_order' => 5, 'slide_target' => '_self']);
+        $this->create_legacy_slide($block, ['slide_title' => 'Second', 'slide_order' => 5, 'slide_target' => '_self',
+            'slide_link' => 'course/index.php']);
         $this->create_legacy_slide($block, [
             'slide_title' => 'First',
             'slide_title2' => 'Sub',
@@ -126,6 +128,7 @@ final class upgradelib_test extends \advanced_testcase {
         $this->assertSame('Alt', $list[0]->alttext);
         $this->assertEquals(1, $list[0]->newwindow);
         $this->assertEquals(0, $list[1]->newwindow);
+        $this->assertSame('/course/index.php', $list[1]->link);
         $this->assertEquals(1, $list[1]->visible);
 
         $images = slides::get_images($context);

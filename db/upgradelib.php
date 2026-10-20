@@ -56,7 +56,7 @@ function block_slider_migrate_legacy_slides(): int {
                 'title' => block_slider_legacy_text($old->slide_title ?? null, 255),
                 'subtitle' => block_slider_legacy_text($old->slide_title2 ?? null, 255),
                 'description' => trim((string) ($old->slide_desc ?? '')),
-                'link' => block_slider_legacy_text($old->slide_link ?? null, 1333),
+                'link' => block_slider_legacy_link($old->slide_link ?? null),
                 'newwindow' => (($old->slide_target ?? '') === '_blank') ? 1 : 0,
                 'buttontext' => block_slider_legacy_text($old->slide_button ?? null, 255),
                 'alttext' => block_slider_legacy_text($old->slide_alt ?? null, 255),
@@ -121,6 +121,20 @@ function block_slider_migrate_legacy_slides(): int {
  */
 function block_slider_legacy_text(?string $value, int $length): string {
     return core_text::substr(trim((string) $value), 0, $length);
+}
+
+/**
+ * Stary link: ścieżki względne dostają początkowy "/", jak wymaga formularz slajdu.
+ *
+ * @param string|null $link link ze starej tabeli
+ * @return string
+ */
+function block_slider_legacy_link(?string $link): string {
+    $link = block_slider_legacy_text($link, 1333);
+    if ($link !== '' && !preg_match('~^[a-z][a-z0-9+.-]*://~i', $link) && strpos($link, '/') !== 0) {
+        $link = '/' . $link;
+    }
+    return $link;
 }
 
 /**
