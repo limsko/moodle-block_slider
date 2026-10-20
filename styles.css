@@ -38,6 +38,13 @@
     touch-action: pan-y;
 }
 
+/* Bez kontenera przewijania - np. wyszukiwanie na stronie nie przesunie slajdów. */
+@supports (overflow: clip) {
+    .block-slider-viewport {
+        overflow: clip;
+    }
+}
+
 .block-slider-track {
     display: flex;
     gap: var(--block-slider-gap);

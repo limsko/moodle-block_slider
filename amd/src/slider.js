@@ -29,11 +29,8 @@ define([], function() {
     /** @var {number} Minimalne przesunięcie palca/myszy uznawane za gest (px). */
     var SWIPE_THRESHOLD = 40;
 
-    /** @var {Array} Progi szerokości slajdera ograniczające liczbę widocznych slajdów. */
-    var BREAKPOINTS = [
-        {maxwidth: 480, perview: 1},
-        {maxwidth: 768, perview: 2}
-    ];
+    /** @var {number} Najmniejsza szerokość slajdu (px) przy kilku slajdach widocznych naraz. */
+    var MIN_SLIDE_WIDTH = 220;
 
     /** @var {Array} Progi szerokości pojedynczego slajdu dla mniejszych napisów i sterowania. */
     var SIZES = [
@@ -110,11 +107,11 @@ define([], function() {
     Slider.prototype.updatePerview = function() {
         var perview = this.fade ? 1 : Math.max(1, parseInt(this.config.perview, 10) || 1);
         var width = this.root.clientWidth;
-        BREAKPOINTS.forEach(function(breakpoint) {
-            if (width && width < breakpoint.maxwidth) {
-                perview = Math.min(perview, breakpoint.perview);
-            }
-        });
+        if (width && perview > 1) {
+            // Tyle slajdów, ile zmieści się przy minimalnej szerokości (z odstępami).
+            var gap = parseFloat(window.getComputedStyle(this.track).columnGap) || 0;
+            perview = Math.max(1, Math.min(perview, Math.floor((width + gap) / (MIN_SLIDE_WIDTH + gap))));
+        }
         perview = Math.min(perview, this.slides.length);
         var changed = perview !== this.perview;
         this.perview = perview;
@@ -376,6 +373,13 @@ define([], function() {
         });
         document.addEventListener('visibilitychange', function() {
             self.schedule();
+        });
+        // Położenie wyznacza transform - przewinięcie okna (np. przez scrollIntoView) cofamy.
+        this.viewport.addEventListener('scroll', function() {
+            if (self.viewport.scrollLeft || self.viewport.scrollTop) {
+                self.viewport.scrollLeft = 0;
+                self.viewport.scrollTop = 0;
+            }
         });
 
         this.region.addEventListener('keydown', function(e) {
