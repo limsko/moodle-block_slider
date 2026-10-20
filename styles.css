@@ -1,6 +1,6 @@
 /* Slajder: zmienne ustawiane z konfiguracji instancji (atrybut style). */
 .block-slider {
-    --block-slider-accent: var(--primary, #0f6cbf);
+    --block-slider-accent: var(--bs-primary, #0f6cbf);
     --block-slider-per-view: 1;
     --block-slider-visible: var(--block-slider-per-view);
     --block-slider-gap: 16px;

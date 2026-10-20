@@ -24,8 +24,8 @@ namespace block_slider\local;
  * @author      Kamil Łuczak <kamil@limsko.pl>
  * @copyright   (C) 2026 Kamil Łuczak (https://limsko.pl)
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @covers      \block_slider\local\slides
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(slides::class)]
 final class slides_test extends \advanced_testcase {
     /**
      * Generator bloku slajdera.
@@ -235,10 +235,10 @@ final class slides_test extends \advanced_testcase {
     /**
      * Poprawne i niepoprawne linki.
      *
-     * @dataProvider link_provider
      * @param string $link link
      * @param bool $valid oczekiwany wynik
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('link_provider')]
     public function test_is_valid_link(string $link, bool $valid): void {
         $this->assertSame($valid, slides::is_valid_link($link));
     }

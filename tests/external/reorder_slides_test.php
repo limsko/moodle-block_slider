@@ -17,12 +17,8 @@
 namespace block_slider\external;
 
 use block_slider\local\slides;
-use externallib_advanced_testcase;
-
-defined('MOODLE_INTERNAL') || die();
-
-global $CFG;
-require_once($CFG->dirroot . '/webservice/tests/helpers.php');
+use core_external\external_api;
+use core_external\tests\externallib_testcase;
 
 /**
  * Testy zapisu kolejności slajdów przez usługę.
@@ -32,9 +28,9 @@ require_once($CFG->dirroot . '/webservice/tests/helpers.php');
  * @author      Kamil Łuczak <kamil@limsko.pl>
  * @copyright   (C) 2026 Kamil Łuczak (https://limsko.pl)
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @covers      \block_slider\external\reorder_slides
  */
-final class reorder_slides_test extends externallib_advanced_testcase {
+#[\PHPUnit\Framework\Attributes\CoversClass(reorder_slides::class)]
+final class reorder_slides_test extends externallib_testcase {
     /**
      * Blok w kursie z trzema slajdami.
      *
@@ -60,7 +56,7 @@ final class reorder_slides_test extends externallib_advanced_testcase {
         $this->setUser($this->getDataGenerator()->create_and_enrol($course, 'editingteacher'));
 
         $result = reorder_slides::execute($block->id, [$created[2]->id, $created[0]->id, $created[1]->id]);
-        $result = \core_external\external_api::clean_returnvalue(reorder_slides::execute_returns(), $result);
+        $result = external_api::clean_returnvalue(reorder_slides::execute_returns(), $result);
 
         $this->assertSame([(int) $created[2]->id, (int) $created[0]->id, (int) $created[1]->id], $result['slideids']);
         $this->assertSame(['C', 'A', 'B'], array_column(slides::get_slides($block->id), 'title'));

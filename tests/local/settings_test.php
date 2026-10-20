@@ -24,8 +24,8 @@ namespace block_slider\local;
  * @author      Kamil Łuczak <kamil@limsko.pl>
  * @copyright   (C) 2026 Kamil Łuczak (https://limsko.pl)
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @covers      \block_slider\local\settings
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(settings::class)]
 final class settings_test extends \basic_testcase {
     /**
      * Brak konfiguracji daje wartości domyślne.

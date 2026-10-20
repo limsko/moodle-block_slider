@@ -27,10 +27,10 @@ use block_slider\local\slides;
  * @author      Kamil Łuczak <kamil@limsko.pl>
  * @copyright   (C) 2026 Kamil Łuczak (https://limsko.pl)
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @covers      \block_slider\output\slider
- * @covers      \block_slider\output\manage_page
- * @covers      \block_slider\output\renderer
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(slider::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(manage_page::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(renderer::class)]
 final class slider_test extends \advanced_testcase {
     /**
      * Blok z trzema slajdami o różnych ustawieniach.

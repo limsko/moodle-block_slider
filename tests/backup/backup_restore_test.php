@@ -35,11 +35,11 @@ require_once($CFG->dirroot . '/backup/util/includes/restore_includes.php');
  * @author      Kamil Łuczak <kamil@limsko.pl>
  * @copyright   (C) 2026 Kamil Łuczak (https://limsko.pl)
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @covers      \backup_slider_block_task
- * @covers      \backup_slider_block_structure_step
- * @covers      \restore_slider_block_task
- * @covers      \restore_slider_block_structure_step
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(\backup_slider_block_task::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(\backup_slider_block_structure_step::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(\restore_slider_block_task::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(\restore_slider_block_structure_step::class)]
 final class backup_restore_test extends \advanced_testcase {
     /**
      * Slajdy, kolejność, widoczność i grafiki trafiają do kopii kursu.

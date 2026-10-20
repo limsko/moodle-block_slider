@@ -107,8 +107,8 @@ define([
                 return Str.get_string('slidenumber', 'block_slider', position);
             };
 
-            $(list).on(SortableList.EVENTS.DROP, '> [data-slideid]', function(e, info) {
-                if (!info.positionChanged) {
+            list.addEventListener(SortableList.EVENTS.elementDrop, function(e) {
+                if (!e.detail || !e.detail.positionChanged) {
                     return;
                 }
                 renumber(list);

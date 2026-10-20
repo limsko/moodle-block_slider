@@ -31,8 +31,8 @@ use core_privacy\tests\provider_testcase;
  * @author      Kamil Łuczak <kamil@limsko.pl>
  * @copyright   (C) 2026 Kamil Łuczak (https://limsko.pl)
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @covers      \block_slider\privacy\provider
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(provider::class)]
 final class provider_test extends provider_testcase {
     /**
      * Slajder na kokpicie użytkownika.

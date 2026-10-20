@@ -32,13 +32,13 @@ require_once($CFG->dirroot . '/blocks/slider/db/upgradelib.php');
  * @author      Kamil Łuczak <kamil@limsko.pl>
  * @copyright   (C) 2026 Kamil Łuczak (https://limsko.pl)
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @covers      ::block_slider_migrate_legacy_slides
- * @covers      ::block_slider_migrate_legacy_config
- * @covers      ::block_slider_convert_legacy_config
- * @covers      ::block_slider_legacy_ratio
- * @covers      ::block_slider_legacy_speed
- * @covers      ::block_slider_legacy_link
  */
+#[\PHPUnit\Framework\Attributes\CoversFunction('block_slider_migrate_legacy_slides')]
+#[\PHPUnit\Framework\Attributes\CoversFunction('block_slider_migrate_legacy_config')]
+#[\PHPUnit\Framework\Attributes\CoversFunction('block_slider_convert_legacy_config')]
+#[\PHPUnit\Framework\Attributes\CoversFunction('block_slider_legacy_ratio')]
+#[\PHPUnit\Framework\Attributes\CoversFunction('block_slider_legacy_speed')]
+#[\PHPUnit\Framework\Attributes\CoversFunction('block_slider_legacy_link')]
 final class upgradelib_test extends \advanced_testcase {
     /**
      * Tymczasowa tabela w formacie wersji 0.6.

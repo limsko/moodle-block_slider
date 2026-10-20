@@ -32,8 +32,8 @@ require_once($CFG->dirroot . '/blocks/slider/block_slider.php');
  * @author      Kamil Łuczak <kamil@limsko.pl>
  * @copyright   (C) 2026 Kamil Łuczak (https://limsko.pl)
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @covers      \block_slider
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(\block_slider::class)]
 final class block_slider_test extends \advanced_testcase {
     /**
      * Strona kursu, na której wyświetlany jest blok.

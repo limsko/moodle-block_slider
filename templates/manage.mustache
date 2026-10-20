@@ -104,22 +104,22 @@
                 <div class="block-slider-manage-title">
                     {{#untitled}}<span class="block-slider-manage-muted">{{#str}} notitle, block_slider {{/str}}</span>{{/untitled}}
                     {{^untitled}}<span data-region="title">{{{title}}}</span>{{/untitled}}
-                    {{^visible}}<span class="badge badge-secondary">{{#str}} hiddenfromstudents {{/str}}</span>{{/visible}}
+                    {{^visible}}<span class="badge bg-secondary">{{#str}} hiddenfromstudents {{/str}}</span>{{/visible}}
                 </div>
                 {{#subtitle}}<div class="block-slider-manage-muted">{{{subtitle}}}</div>{{/subtitle}}
                 {{#description}}<div class="block-slider-manage-muted small">{{{description}}}</div>{{/description}}
                 {{#link}}
                 <div class="block-slider-manage-link">
                     <span class="block-slider-manage-linktext" title="{{link}}">{{linkshort}}</span>
-                    <span class="sr-only" id="block-slider-link-{{id}}">{{link}}</span>
+                    <span class="visually-hidden" id="block-slider-link-{{id}}">{{link}}</span>
                     <button type="button" class="btn btn-link btn-sm p-0" data-action="copytoclipboard" data-clipboard-target="#block-slider-link-{{id}}" data-clipboard-success-message="{{#str}} linkcopied, block_slider {{/str}}">
                         {{#pix}} t/copy, core, {{#str}} copylink, block_slider {{/str}} {{/pix}}
                     </button>
                     <a href="{{link}}" target="_blank" rel="noopener" title="{{#str}} openlink, block_slider {{/str}}">
                         {{#pix}} i/externallink, core, {{#str}} openlink, block_slider {{/str}} {{/pix}}
                     </a>
-                    {{#newwindow}}<span class="badge badge-light">{{#str}} newwindow, block_slider {{/str}}</span>{{/newwindow}}
-                    {{#buttonlabel}}<span class="badge badge-light">{{{buttonlabel}}}</span>{{/buttonlabel}}
+                    {{#newwindow}}<span class="badge bg-light text-dark">{{#str}} newwindow, block_slider {{/str}}</span>{{/newwindow}}
+                    {{#buttonlabel}}<span class="badge bg-light text-dark">{{{buttonlabel}}}</span>{{/buttonlabel}}
                 </div>
                 {{/link}}
             </div>
