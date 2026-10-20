@@ -14,101 +14,87 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- * Privacy Subsystem implementation for block_slider.
- *
- * @package   block_slider
- * @copyright 2015-2020 Kamil Łuczak    www.limsko.pl     kamil@limsko.pl
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-
 namespace block_slider\privacy;
 
-defined('MOODLE_INTERNAL') || die();
-
-use \core_privacy\local\request\userlist;
-use \core_privacy\local\request\approved_contextlist;
-use \core_privacy\local\request\approved_userlist;
-use \core_privacy\local\request\writer;
-use \core_privacy\local\request\helper;
-use \core_privacy\local\request\deletion_criteria;
-use \core_privacy\local\metadata\collection;
+use block_slider\local\slides;
+use core_privacy\local\metadata\collection;
+use core_privacy\local\request\approved_contextlist;
+use core_privacy\local\request\approved_userlist;
+use core_privacy\local\request\contextlist;
+use core_privacy\local\request\helper;
+use core_privacy\local\request\transform;
+use core_privacy\local\request\userlist;
+use core_privacy\local\request\writer;
 
 /**
- * Privacy Subsystem implementation for block_slider.
+ * Prywatność bloku slajdera.
  *
- * @copyright 2015-2020 Kamil Łuczak    www.limsko.pl     kamil@limsko.pl
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * Slajdy nie są przypisane do autora. Danymi osobowymi są tylko slajdery na kokpicie
+ * użytkownika - należą do właściciela kokpitu, tak jak w bloku HTML.
+ *
+ * @package     block_slider
+ * @author      Kamil Łuczak <kamil@limsko.pl>
+ * @copyright   (C) 2015-2026 Kamil Łuczak (https://limsko.pl)
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class provider implements
-        // The block_slider block stores user provided data.
-        \core_privacy\local\metadata\provider,
-
-        // This plugin is capable of determining which users have data within it.
-        \core_privacy\local\request\core_userlist_provider,
-
-        // The block_slider block provides data directly to core.
-        \core_privacy\local\request\plugin\provider {
-
+    \core_privacy\local\metadata\provider,
+    \core_privacy\local\request\core_userlist_provider,
+    \core_privacy\local\request\plugin\provider {
     /**
-     * Returns information about how block_slider stores its data.
+     * Opis przechowywanych danych.
      *
-     * @param collection $collection The initialised collection to add items to.
-     * @return  collection     A listing of user data stored through this system.
+     * @param collection $collection kolekcja do uzupełnienia
+     * @return collection
      */
     public static function get_metadata(collection $collection): collection {
-        $collection->add_database_table('slider_slides', [
-                'slide_link' => 'privacy:metadata:slide_link',
-                'slide_title' => 'privacy:metadata:slide_title',
-                'slide_desc' => 'privacy:metadata:slide_desc',
-                'slide_image' => 'privacy:metadata:slide_image'
-        ], 'privacy:metadata:slider_slides');
-
+        $collection->add_database_table(slides::TABLE, [
+            'title' => 'privacy:metadata:block_slider_slides:title',
+            'subtitle' => 'privacy:metadata:block_slider_slides:subtitle',
+            'description' => 'privacy:metadata:block_slider_slides:description',
+            'link' => 'privacy:metadata:block_slider_slides:link',
+            'buttontext' => 'privacy:metadata:block_slider_slides:buttontext',
+            'alttext' => 'privacy:metadata:block_slider_slides:alttext',
+            'timemodified' => 'privacy:metadata:block_slider_slides:timemodified',
+        ], 'privacy:metadata:block_slider_slides');
         $collection->link_subsystem('block', 'privacy:metadata:block');
+        $collection->link_subsystem('core_files', 'privacy:metadata:core_files');
 
         return $collection;
     }
 
     /**
-     * Get the list of contexts that contain user information for the specified user.
+     * Konteksty z danymi użytkownika - slajdery na jego kokpicie.
      *
-     * @param int $userid The user to search.
-     * @return  contextlist   $contextlist  The contextlist containing the list of contexts used in this plugin.
+     * @param int $userid użytkownik
+     * @return contextlist
      */
-    public static function get_contexts_for_userid(int $userid): \core_privacy\local\request\contextlist {
-        // This block doesn't know who information is stored against unless it
-        // is at the user context.
-        $contextlist = new \core_privacy\local\request\contextlist();
+    public static function get_contexts_for_userid(int $userid): contextlist {
+        $contextlist = new contextlist();
 
         $sql = "SELECT c.id
                   FROM {block_instances} b
-            INNER JOIN {context} c ON c.instanceid = b.id AND c.contextlevel = :contextblock
-            INNER JOIN {context} bpc ON bpc.id = b.parentcontextid
+                  JOIN {context} c ON c.instanceid = b.id AND c.contextlevel = :contextblock
+                  JOIN {context} bpc ON bpc.id = b.parentcontextid
                  WHERE b.blockname = 'slider'
                    AND bpc.contextlevel = :contextuser
                    AND bpc.instanceid = :userid";
-
-        $params = [
-                'contextblock' => CONTEXT_BLOCK,
-                'contextuser' => CONTEXT_USER,
-                'userid' => $userid,
-        ];
-
-        $contextlist->add_from_sql($sql, $params);
+        $contextlist->add_from_sql($sql, [
+            'contextblock' => CONTEXT_BLOCK,
+            'contextuser' => CONTEXT_USER,
+            'userid' => $userid,
+        ]);
 
         return $contextlist;
     }
 
     /**
-     * Get the list of users who have data within a context.
+     * Użytkownicy z danymi w kontekście bloku.
      *
-     * @param userlist $userlist The userlist containing the list of users who have data in this context/plugin combination.
+     * @param userlist $userlist lista do uzupełnienia
      */
     public static function get_users_in_context(userlist $userlist) {
-        // This block doesn't know who information is stored against unless it
-        // is at the user context.
         $context = $userlist->get_context();
-
         if (!$context instanceof \context_block) {
             return;
         }
@@ -116,129 +102,100 @@ class provider implements
         $sql = "SELECT bpc.instanceid AS userid
                   FROM {block_instances} bi
                   JOIN {context} bpc ON bpc.id = bi.parentcontextid
-                 WHERE bi.blockname = 'html'
+                 WHERE bi.blockname = 'slider'
                    AND bpc.contextlevel = :contextuser
                    AND bi.id = :blockinstanceid";
-
-        $params = [
-                'contextuser' => CONTEXT_USER,
-                'blockinstanceid' => $context->instanceid
-        ];
-
-        $userlist->add_from_sql('userid', $sql, $params);
+        $userlist->add_from_sql('userid', $sql, [
+            'contextuser' => CONTEXT_USER,
+            'blockinstanceid' => $context->instanceid,
+        ]);
     }
 
     /**
-     * Export all user data for the specified user, in the specified contexts.
+     * Eksport slajdów i grafik.
      *
-     * @param approved_contextlist $contextlist The approved contexts to export information for.
+     * @param approved_contextlist $contextlist zatwierdzone konteksty
      */
     public static function export_user_data(approved_contextlist $contextlist) {
-        global $CFG, $DB;
-
         $user = $contextlist->get_user();
 
-        list($contextsql, $contextparams) = $DB->get_in_or_equal($contextlist->get_contextids(), SQL_PARAMS_NAMED);
-
-        $sql = "SELECT
-                    c.id AS contextid,
-                    bi.*
-                  FROM {context} c
-            INNER JOIN {block_instances} bi ON bi.id = c.instanceid AND c.contextlevel = :contextlevel
-                 WHERE bi.blockname = 'slider'
-                   AND(
-                    c.id {$contextsql}
-                )
-        ";
-
-        $params = [
-                'contextlevel' => CONTEXT_BLOCK,
-        ];
-        $params += $contextparams;
-
-        $instances = $DB->get_recordset_sql($sql, $params);
-        foreach ($instances as $instance) {
-            $context = \context_block::instance($instance->id);
-            $block = block_instance('slider', $instance);
-            if (!$slides = $DB->get_records('slider_slides', array('sliderid' => $instance->id), 'slide_order ASC')) {
-                return;
-            } else {
-                $html = '';
-                foreach ($slides as $slide) {
-                    $imageurl =
-                            $CFG->wwwroot . '/pluginfile.php/' . $context->id . '/block_slider/slider_slides/' . $slide->id .
-                            '/' . $slide->slide_image;
-                    $html .= '<h3>Slide ' . $slide->id . '</h3><br />Slide link: ' . $slide->slide_link;
-                    $html .= '<br />Slide title: ' . $slide->slide_title;
-                    $html .= '<br />Slide desc: ' . $slide->slide_desc;
-                    $html .= '<br />Slide image: ' . html_writer::empty_tag('img',
-                                    array('src' => $imageurl, 'class' => 'img', 'alt' => $slide->slide_image,
-                                            'title' => $slide->slide_title));
-                }
+        foreach ($contextlist->get_contexts() as $context) {
+            if (!$context instanceof \context_block || !($instance = static::get_instance_from_context($context))) {
+                continue;
             }
+            $parent = $context->get_parent_context();
+            if (!$parent || $parent->contextlevel != CONTEXT_USER || (int) $parent->instanceid !== (int) $user->id) {
+                continue;
+            }
+            $block = block_instance('slider', $instance);
             $data = helper::get_context_data($context, $user);
-            helper::export_context_files($context, $user);
-            $data->title = $block->config->title;
-            $data->content = $html;
+            $data->title = $block->title;
+            $data->slides = [];
+
+            foreach (slides::get_slides($instance->id) as $slide) {
+                $subcontext = [get_string('slides', 'block_slider'), $slide->id];
+                $data->slides[] = (object) [
+                    'title' => $slide->title,
+                    'subtitle' => $slide->subtitle,
+                    'description' => $slide->description,
+                    'link' => $slide->link,
+                    'buttontext' => $slide->buttontext,
+                    'alttext' => $slide->alttext,
+                    'visible' => transform::yesno($slide->visible),
+                    'timemodified' => transform::datetime($slide->timemodified),
+                ];
+                $writer = writer::with_context($context);
+                $writer->export_area_files($subcontext, 'block_slider', slides::AREA_IMAGE, $slide->id);
+                $writer->export_area_files($subcontext, 'block_slider', slides::AREA_MOBILE, $slide->id);
+            }
 
             writer::with_context($context)->export_data([], $data);
         }
-        $instances->close();
     }
 
     /**
-     * Delete all data for all users in the specified context.
+     * Usunięcie danych wszystkich użytkowników w kontekście.
      *
-     * @param context $context The specific context to delete data for.
+     * Usuwana jest cała instancja bloku, ale tylko na kokpicie - slajdy kursów i strony głównej
+     * nie są danymi osobowymi.
+     *
+     * @param \context $context kontekst
      */
     public static function delete_data_for_all_users_in_context(\context $context) {
-
-        if (!$context instanceof \context_block) {
+        if (!$context instanceof \context_block || !($instance = static::get_instance_from_context($context))) {
             return;
         }
-
-        // The only way to delete data for the html block is to delete the block instance itself.
-        if ($blockinstance = static::get_instance_from_context($context)) {
-            blocks_delete_instance($blockinstance);
+        $parent = $context->get_parent_context();
+        if ($parent && $parent->contextlevel == CONTEXT_USER) {
+            blocks_delete_instance($instance);
         }
     }
 
     /**
-     * Delete multiple users within a single context.
+     * Usunięcie danych wybranych użytkowników w jednym kontekście.
      *
-     * @param approved_userlist $userlist The approved context and user information to delete information for.
+     * @param approved_userlist $userlist zatwierdzona lista
      */
     public static function delete_data_for_users(approved_userlist $userlist) {
-        $context = $userlist->get_context();
-
-        if ($context instanceof \context_block && ($blockinstance = static::get_instance_from_context($context))) {
-            blocks_delete_instance($blockinstance);
-        }
+        static::delete_data_for_all_users_in_context($userlist->get_context());
     }
 
     /**
-     * Delete all user data for the specified user, in the specified contexts.
+     * Usunięcie danych użytkownika w wybranych kontekstach.
      *
-     * @param approved_contextlist $contextlist The approved contexts and user information to delete information for.
+     * @param approved_contextlist $contextlist zatwierdzone konteksty
      */
     public static function delete_data_for_user(approved_contextlist $contextlist) {
-        // The only way to delete data for the html block is to delete the block instance itself.
         foreach ($contextlist as $context) {
-
-            if (!$context instanceof \context_block) {
-                continue;
-            }
-            if ($blockinstance = static::get_instance_from_context($context)) {
-                blocks_delete_instance($blockinstance);
-            }
+            static::delete_data_for_all_users_in_context($context);
         }
     }
 
     /**
-     * Get the block instance record for the specified context.
+     * Instancja bloku slajdera dla kontekstu.
      *
-     * @param \context_block $context The context to fetch
-     * @return  \stdClass
+     * @param \context_block $context kontekst bloku
+     * @return \stdClass|false
      */
     protected static function get_instance_from_context(\context_block $context) {
         global $DB;
